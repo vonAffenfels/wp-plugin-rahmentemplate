@@ -1,5 +1,5 @@
 {
-  "name": "vonaffenfels/wp-plugin-rahmentemplate",
+  "name": "va/wp-plugin-rahmentemplate",
   "type": "wordpress-plugin",
   "description": "Plugin to replace content from a Template",
   "homepage": "https://github.com/vonAffenfels/wp-plugin-rahmentemplate",

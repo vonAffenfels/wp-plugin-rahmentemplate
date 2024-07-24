@@ -56,8 +56,6 @@ class SettingsPage
             'rahmentemplate-settings-page',
             'rahmentemplate_settings_section'
         );
-
-
     }
 
     public function rahmentemplate_sanitize($input) {
@@ -73,28 +71,13 @@ class SettingsPage
     public function rahmentemplate_settings_input_field_callback(): void
     {
         $templates = get_option('rahmentemplate_settings_input_field', array());
+        self::markup($templates);
+        self::css();
+        self::js();
+    }
 
+    public function markup($templates) {
         ?>
-        <style>
-            .repeatable-fieldset-container {
-                display: flex;
-                flex-direction: column;
-            }
-            .repeatable-fieldset {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            .repeatable-fieldset select {
-                flex: 1;
-            }
-            .repeatable-fieldset-actions {
-                margin-top: 10px;
-            }
-            .repeatable-fieldset-actions button {
-                margin-right: 10px;
-            }
-        </style>
         <div class="repeatable-fieldset-container">
             <?php if ($templates) {
                 foreach ($templates as $key => $field) { ?>
@@ -121,6 +104,36 @@ class SettingsPage
         <div class="repeatable-fieldset-actions">
             <button id="add-row" class="button">Hinzufügen</button>
         </div>
+        <?php
+    }
+
+    public function css() {
+        ?>
+        <style>
+            .repeatable-fieldset-container {
+                display: flex;
+                flex-direction: column;
+            }
+            .repeatable-fieldset {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .repeatable-fieldset select {
+                flex: 1;
+            }
+            .repeatable-fieldset-actions {
+                margin-top: 10px;
+            }
+            .repeatable-fieldset-actions button {
+                margin-right: 10px;
+            }
+        </style>
+        <?php
+    }
+
+    public function js() {
+        ?>
         <script>
             jQuery(document).ready(function($) {
                 $('#add-row').on('click', function() {

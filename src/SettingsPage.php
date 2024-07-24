@@ -13,8 +13,8 @@ class SettingsPage
     public function rahmentemplate_settings_menu() {
 
         add_menu_page(
-            __( 'Rahmentemplate Settings', 'rahmentemplate' ),
-            __( 'Rahmentemplate Settings', 'rahmentemplate' ),
+            __( 'Rahmentemplates', 'rahmentemplate' ),
+            __( 'Rahmentemplates', 'rahmentemplate' ),
             'manage_options',
             'rahmentemplate-settings-page',
             [$this,'rahmentemplate_settings_page'],
@@ -32,7 +32,7 @@ class SettingsPage
         // Setup settings section
         add_settings_section(
             'rahmentemplate_settings_section',
-            'Rahmentemplate Settings Page',
+            'Rahmentemplates',
             '',
             'rahmentemplate-settings-page'
         );
@@ -99,27 +99,27 @@ class SettingsPage
             <?php if ($templates) {
                 foreach ($templates as $key => $field) { ?>
                     <div class="repeatable-fieldset">
-                        <input class="inputTitle" type="text" placeholder="Title" name="rahmentemplate_settings_input_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
-                        <input class="inputURL" type="text" placeholder="Template-URL" name="rahmentemplate_settings_input_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
-                        <button class="remove-row button">Remove</button>
+                        <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
+                        <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
+                        <button class="remove-row button">Löschen</button>
                     </div>
                 <?php }
             } else { ?>
                 <div class="repeatable-fieldset">
-                    <input class="inputTitle" type="text" placeholder="Title" name="rahmentemplate_settings_input_field[0][title]" value="" />
-                    <input class="inputURL" type="text" placeholder="Template-URL" name="rahmentemplate_settings_input_field[0][url]" value="" />
-                    <button class="remove-row button">Remove</button>
+                    <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_field[0][title]" value="" />
+                    <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_field[0][url]" value="" />
+                    <button class="remove-row button">Löschen</button>
                 </div>
             <?php } ?>
             <!-- empty hidden one for jQuery -->
             <div class="empty-row" style="display: none">
-                <input class="inputTitle" type="text" placeholder="Title" name="" />
-                <input class="inputURL" type="text" placeholder="Template-URL" name="" />
-                <button class="remove-row button">Remove</button>
+                <input class="inputTitle" type="text" placeholder="Titel" name="" />
+                <input class="inputURL" type="text" placeholder="URL" name="" />
+                <button class="remove-row button">Löschen</button>
             </div>
         </div>
         <div class="repeatable-fieldset-actions">
-            <button id="add-row" class="button">Add another</button>
+            <button id="add-row" class="button">Hinzufügen</button>
         </div>
         <script>
             jQuery(document).ready(function($) {

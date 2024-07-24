@@ -10,48 +10,27 @@
       "homepage": "https://www.vonaffenfels.de"
     }
   ],
-  "support": {
-    "issues": "https://github.com/vonAffenfels/wp-plugin-rahmentemplate/issues"
-  },
   "keywords": [
-    "wordpress",
-    "wp",
-    "plugin",
-    "template",
-    "replace"
+    "php",
+    "wordpress"
   ],
-  "repositories": [
-    {
-      "type": "git",
-      "url": "git@github.com:vonAffenfels/vaf-wp-framework.git"
-    }
-  ],
-  "config": {
-    "optimize-autoloader": true,
-    "classmap-authoritative": true,
-    "platform": {
-      "php": "8.1"
-    },
-    "sort-packages": true,
-    "allow-plugins": {
-      "php-http/discovery": true
-    }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
   "autoload": {
     "psr-4": {
-      "WP\\Plugin\\Rahmentemplate\\": "src"
+      "Rahmentemplate\\": "src/"
     }
   },
-  "scripts": {
-
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
   },
-
-  "require-dev": {
-    "php": ">=8.1",
-    "guzzlehttp/guzzle": "^7.0",
-    "php-http/guzzle7-adapter": "^1.0",
-    "vonaffenfels/vaf-wp-framework": "^0.2"
+  "require": {
+    "php": ">=7.4",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^6.4 | ^7.4"
+  },
+  "scripts": {
+    "test": [
+      "phpcs"
+    ]
   }
 }

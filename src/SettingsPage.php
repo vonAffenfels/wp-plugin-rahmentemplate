@@ -17,32 +17,11 @@ class SettingsPage
             __( 'Rahmentemplate Settings', 'rahmentemplate' ),
             'manage_options',
             'rahmentemplate-settings-page',
-            [$this,'rahmentemplate_settings_template_callback'],
-            '',
+            [$this,'rahmentemplate_settings_page'],
+            'dashicons-layout',
             null
         );
 
-    }
-
-    public function rahmentemplate_settings_template_callback() {
-        ?>
-        <div class="wrap">
-            <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-
-            <form action="options.php" method="post">
-                <?php
-                // security field
-                settings_fields( 'rahmentemplate-settings-page' );
-
-                // output settings section here
-                do_settings_sections('rahmentemplate-settings-page');
-
-                // save settings button
-                submit_button( 'Save Settings' );
-                ?>
-            </form>
-        </div>
-        <?php
     }
 
     /**
@@ -61,19 +40,19 @@ class SettingsPage
         // Register ID input field
         register_setting(
             'rahmentemplate-settings-page',
-            'rahmentemplate_settings_input_field_id',
+            'rahmentemplate_settings_input_field',
             array(
-                'type' => 'string',
-                'sanitize_callback' => 'sanitize_text_field',
-                'default' => ''
+                'type' => 'array',
+                'sanitize_callback' => [$this, 'rahmentemplate_sanitize'],
+                'default' => array()
             )
         );
 
         // Add ID fields
         add_settings_field(
-            'rahmentemplate_settings_input_field_id',
+            'rahmentemplate_settings_input_field',
             __( 'Templates', 'rahmentemplate' ),
-            [$this,'rahmentemplate_settings_input_field_id_callback'],
+            [$this,'rahmentemplate_settings_input_field_callback'],
             'rahmentemplate-settings-page',
             'rahmentemplate_settings_section'
         );
@@ -81,10 +60,20 @@ class SettingsPage
 
     }
 
+    public function rahmentemplate_sanitize($input) {
+        if (is_array($input)) {
+            foreach ($input as $key => $value) {
+                $input[$key]['title'] = sanitize_text_field($value['title']);
+                $input[$key]['url'] = sanitize_text_field($value['url']);
+            }
+        }
+        return $input;
+    }
 
-    public function rahmentemplate_settings_input_field_id_callback(): void
+    public function rahmentemplate_settings_input_field_callback(): void
     {
-        $postEditionTopTopics = get_option('rahmentemplate_settings_input_field_id');
+        $templates = get_option('rahmentemplate_settings_input_field', array());
+
         ?>
         <style>
             .repeatable-fieldset-container {
@@ -107,25 +96,25 @@ class SettingsPage
             }
         </style>
         <div class="repeatable-fieldset-container">
-            <?php if ($postEditionTopTopics) {
-                foreach ($postEditionTopTopics as $key => $field) { ?>
+            <?php if ($templates) {
+                foreach ($templates as $key => $field) { ?>
                     <div class="repeatable-fieldset">
-                        <input type="text" placeholder="Title" name="template[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
-                        <textarea placeholder="Template-URL" cols="55" rows="5" name="template[<?php echo $key ?>][templateUrl]"><?php echo $field['templateUrl'] ?? ''; ?></textarea>
+                        <input class="inputTitle" type="text" placeholder="Title" name="rahmentemplate_settings_input_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
+                        <input class="inputURL" type="text" placeholder="Template-URL" name="rahmentemplate_settings_input_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
                         <button class="remove-row button">Remove</button>
                     </div>
                 <?php }
             } else { ?>
                 <div class="repeatable-fieldset">
-                    <input type="text" placeholder="Title" name="template[0][title]" value="" />
-                    <textarea placeholder="Template-URL" cols="55" rows="5" name="template[0][templateUrl]"></textarea>
+                    <input class="inputTitle" type="text" placeholder="Title" name="rahmentemplate_settings_input_field[0][title]" value="" />
+                    <input class="inputURL" type="text" placeholder="Template-URL" name="rahmentemplate_settings_input_field[0][url]" value="" />
                     <button class="remove-row button">Remove</button>
                 </div>
             <?php } ?>
             <!-- empty hidden one for jQuery -->
             <div class="empty-row" style="display: none">
-                <input type="text" placeholder="Title" name="" />
-                <textarea placeholder="Template-URL" cols="55" rows="5" name=""></textarea>
+                <input class="inputTitle" type="text" placeholder="Title" name="" />
+                <input class="inputURL" type="text" placeholder="Template-URL" name="" />
                 <button class="remove-row button">Remove</button>
             </div>
         </div>
@@ -143,8 +132,8 @@ class SettingsPage
 
                     var containers = $('.repeatable-fieldset-container').find('.repeatable-fieldset');
                     containers.each(function(containerIndex) {
-                        $(this).find('input[type="text"]').attr('name', 'template[' + containerIndex + '][title]');
-                        $(this).find('textarea').attr('name', 'template[' + containerIndex + '][templateUrl]');
+                        $(this).find('.inputTitle').attr('name', 'rahmentemplate_settings_input_field[' + containerIndex + '][title]');
+                        $(this).find('.inputURL').attr('name', 'rahmentemplate_settings_input_field[' + containerIndex + '][url]');
                     });
 
                     return false;
@@ -155,8 +144,8 @@ class SettingsPage
 
                     var containers = $('.repeatable-fieldset-container').find('.repeatable-fieldset');
                     containers.each(function(containerIndex) {
-                        $(this).find('input[type="text"]').attr('name', 'template[' + containerIndex + '][title]');
-                        $(this).find('textarea').attr('name', 'template[' + containerIndex + '][templateUrl]');
+                        $(this).find('.inputTitle').attr('name', 'rahmentemplate_settings_input_field[' + containerIndex + '][title]');
+                        $(this).find('.inputURL').attr('name', 'rahmentemplate_settings_input_field[' + containerIndex + '][url]');
                     });
 
                     return false;
@@ -165,4 +154,21 @@ class SettingsPage
         </script>
         <?php
     }
+
+    public function rahmentemplate_settings_page() {
+        ?>
+        <div class="wrap">
+            <h2>Rahmentemplate Settings</h2>
+            <form action="options.php" method="post">
+                <?php
+                settings_fields('rahmentemplate-settings-page');
+                do_settings_sections('rahmentemplate-settings-page');
+                submit_button();
+                ?>
+            </form>
+        </div>
+        <?php
+    }
 }
+
+

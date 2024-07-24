@@ -10,7 +10,7 @@ use VAF\WP\Framework\Utils\Dashicons;
 #[AsMenuContainer]
 class Menu
 {
-    public const SLUG_SETTINGS = 'wp-plugin-search-settings';
+    public const SLUG_SETTINGS = 'wp-plugin-rahmentemplate-settings';
 
     #[MenuItem(
         menuTitle: 'Rahmentemplate',

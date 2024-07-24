@@ -13,8 +13,8 @@ class SettingsPage
     public function rahmentemplate_settings_menu() {
 
         add_menu_page(
-            __( 'Version List Settings', 'rahmentemplate' ),
-            __( 'Version List Settings', 'rahmentemplate' ),
+            __( 'Rahmentemplate Settings', 'rahmentemplate' ),
+            __( 'Rahmentemplate Settings', 'rahmentemplate' ),
             'manage_options',
             'rahmentemplate-settings-page',
             [$this,'rahmentemplate_settings_template_callback'],
@@ -41,9 +41,6 @@ class SettingsPage
                 submit_button( 'Save Settings' );
                 ?>
             </form>
-            <form method="post">
-                <input type="submit" name="btn-send-to-api" value="Send Information to API">
-            </form>
         </div>
         <?php
     }
@@ -56,7 +53,7 @@ class SettingsPage
         // Setup settings section
         add_settings_section(
             'rahmentemplate_settings_section',
-            'rahmentemplate Settings Page',
+            'Rahmentemplate Settings Page',
             '',
             'rahmentemplate-settings-page'
         );

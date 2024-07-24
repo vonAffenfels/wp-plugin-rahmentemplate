@@ -8,6 +8,9 @@ class Plugin
     {
         $settingsPage = new SettingsPage();
         $settingsPage->initSettingsPage();
+
+        $metaBox = new MetaBox();
+        $metaBox->registerField();
     }
 
 }

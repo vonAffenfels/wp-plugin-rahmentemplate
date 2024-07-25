@@ -17,8 +17,10 @@ class Plugin
 
     public function mytheme_content_filter( $content ) {
 
-        $templateHandler = new TemplateHandler();
-        $templateHandler->initTemplateHandler($content);
+        if(is_front_page()) {
+            $templateHandler = new TemplateHandler();
+            $templateHandler->initTemplateHandler($content);
+        }
 
         return $content;
     }

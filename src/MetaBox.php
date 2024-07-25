@@ -61,7 +61,7 @@ class MetaBox
                 <?php foreach ($templates as $template) {
                     $selected = ($selected_template == $template['title'] || $default_template == $template['title']) ?? '';
                     ?>
-                    <option value="<?php echo esc_attr($template['title'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
+                    <option value="<?php echo esc_attr($template['url'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
                 <?php } ?>
             </select>
         </div>

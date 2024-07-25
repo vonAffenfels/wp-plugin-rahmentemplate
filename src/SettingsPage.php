@@ -103,7 +103,7 @@ class SettingsPage
                     ?>
                     <option value="<?php echo esc_attr($template['title'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
                 <?php } ?>
-            </select>
+        </select>
         <?php
     }
 
@@ -357,5 +357,3 @@ class SettingsPage
         }
     }
 }
-
-

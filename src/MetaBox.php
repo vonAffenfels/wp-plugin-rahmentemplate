@@ -33,26 +33,36 @@ class MetaBox
             return;
         }
 
-        $templates = $_POST['rahmentemplate_settings_input_field'] ?? [];
-        update_post_meta($postID, 'rahmentemplate_settings_input_field', $templates);
+        $templates = $_POST['rahmentemplate_settings_input_templates_field'] ?? [];
+        update_post_meta($postID, 'rahmentemplate_settings_input_templates_field', $templates);
     }
 
     public static function html(): void
     {
         wp_nonce_field('rahmentemplate_settings_page_nonce', 'rahmentemplate_settings_page_nonce');
 
-        $templates = get_option('rahmentemplate_settings_input_field', []);
-        self::markup($templates);
+        $templates = get_option('rahmentemplate_settings_input_templates_field', []);
+        $selected_template = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
+        $default_template = get_option('rahmentemplate_settings_input_default_field', 'Template auswählen');
+
+        self::markup($templates, $selected_template, $default_template);
     }
 
-    public static function markup($templates): void
+    public static function markup($templates, $selected_template, $default_template): void
     {
         ?>
-        <div class="test">
-            <select name="rahmentemplate_settings_input_field">
-                <?php foreach ($templates as $template) : ?>
-                    <option value="<?php echo esc_attr($template['title']); ?>"><?php echo esc_html($template['title']); ?></option>
-                <?php endforeach; ?>
+        <div class="section templates">
+            <select name="rahmentemplate_settings_input_templates_field">
+                <? if (!$selected_template && !$default_template) : ?>
+                    <option value="" selected>Template auswählen</option>
+                <? endif; ?>
+
+
+                <?php foreach ($templates as $template) {
+                    $selected = ($selected_template == $template['title'] || $default_template == $template['title']) ?? '';
+                    ?>
+                    <option value="<?php echo esc_attr($template['title'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
+                <?php } ?>
             </select>
         </div>
         <?php

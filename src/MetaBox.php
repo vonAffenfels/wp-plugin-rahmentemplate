@@ -56,10 +56,15 @@ class MetaBox
                 <? if (!$selected_template && !$default_template) : ?>
                     <option value="" selected>Template auswählen</option>
                 <? endif; ?>
-
-
-                <?php foreach ($templates as $template) {
-                    $selected = ($selected_template == $template['url'] || $default_template == $template['title']) ?? '';
+                <?php
+                foreach ($templates as $template) {
+                    if ($default_template === $template['url'] && !$selected_template) {
+                        $selected = true;
+                    } elseif ($selected_template === $template['url']) {
+                        $selected = true;
+                    } else {
+                        $selected = false;
+                    }
                     ?>
                     <option value="<?php echo esc_attr($template['url'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
                 <?php } ?>

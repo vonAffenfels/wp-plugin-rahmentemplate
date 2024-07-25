@@ -99,9 +99,9 @@ class SettingsPage
          <select name="rahmentemplate_settings_input_default_field">
                 <option value="">Template auswählen</option>
                 <?php foreach ($templates as $template) {
-                    $selected = $selected_template == $template['title'] ?? '';
+                    $selected = $selected_template == $template['url'] ?? '';
                     ?>
-                    <option value="<?php echo esc_attr($template['title'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
+                    <option value="<?php echo esc_attr($template['url'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
                 <?php } ?>
         </select>
         <?php
@@ -316,8 +316,8 @@ class SettingsPage
                 <div class="input-group">
                     <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
                     <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
-                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['title'], $counted_templates) && $field['title']) ? $counted_templates[$field['title']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
-                    <?php if (!array_key_exists($field['title'], $counted_templates) || !$field['title'] ) { ?>
+                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['url'], $counted_templates) && $field['url']) ? $counted_templates[$field['url']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
+                    <?php if (!array_key_exists($field['url'], $counted_templates) || !$field['url'] ) { ?>
                         <button id="remove-row" class="remove-row button">Löschen</button>
                     <?php } else {
                         ?>
@@ -336,13 +336,13 @@ class SettingsPage
 
     private function getDetails($counted_templates, $field): void
     {
-        if (array_key_exists($field['title'], $counted_templates) && $field['title']) {
+        if (array_key_exists($field['url'], $counted_templates) && $field['url']) {
             $args = array(
                 'post_type' => 'page',
                 'meta_query' => array(
                     array(
                         'key' => 'rahmentemplate_settings_input_templates_field',
-                        'value' => $field['title'],
+                        'value' => $field['url'],
                         'compare' => 'LIKE'
                     )
                 )

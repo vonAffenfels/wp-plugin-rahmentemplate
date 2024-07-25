@@ -17,7 +17,7 @@ class Plugin
 
     public function mytheme_content_filter( $content ) {
 
-        if(is_front_page()) {
+        if(!is_admin() && !wp_is_json_request()) {
             $templateHandler = new TemplateHandler();
             $templateHandler->initTemplateHandler($content);
         }

@@ -10,24 +10,31 @@ class TemplateHandler
     /**
      * @throws GuzzleException
      */
-    function initTemplateHandler($content)
+    function initTemplateHandler($content) : void
     {
         $client = new Client([
             'auth' => ['test', 'test'],
         ]);
 
-        $template = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
+        $templateUrl = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
 
-        $result = $client->get($template, [
-            'headers' => [
-                'Accept' => 'gzip',
-            ],
-        ]);
-        echo $result->getBody();
+        if (empty($templateUrl) || !filter_var($templateUrl, FILTER_VALIDATE_URL)) {
+            echo 'Invalid template URL.';
+            exit;
+        }
 
-    
+        try {
+            $template = $client->request('GET', $templateUrl);
+            $templateBody = $template->getBody()->getContents();
 
-        return $content;
+            $contentReplacedTemplate = str_replace('CONTENT', $content, $templateBody);
+
+            echo $contentReplacedTemplate;
+        } catch (\Exception $e) {
+            echo 'An error occurred: ' . $e->getMessage();
+        }
+
+        exit;
     }
 
 }

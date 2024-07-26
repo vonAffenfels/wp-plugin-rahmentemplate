@@ -2,6 +2,7 @@
 
 namespace Rahmentemplate;
 
+use DOMDocument;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -27,13 +28,13 @@ class TemplateHandler
             $template = $client->request('GET', $templateUrl);
             $templateBody = $template->getBody()->getContents();
 
-            $dom = new \DOMDocument();
+            $dom = new DOMDocument();
             @$dom->loadHTML($templateBody);
 
             $parsedUrl = parse_url($templateUrl);
             $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
-            $baseUrl .= rtrim(dirname($parsedUrl['path']), '/') . '/';
-
+            $baseUrl .=  '/';
+          
             $tags = [
                 'img' => 'src',
                 'link' => 'href',

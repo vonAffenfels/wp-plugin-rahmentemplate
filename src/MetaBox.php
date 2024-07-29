@@ -52,7 +52,10 @@ class MetaBox
     {
         ?>
         <div class="section templates">
-            <select name="rahmentemplate_settings_input_templates_field">
+            <div class="infobox">
+                <p>Die Select Box bietet eine Liste von verfügbaren Templates, die für diesen Post verwendet werden können.</p>
+            </div>
+            <select name="rahmentemplate_settings_input_templates_field" class="selectDefault">
                 <? if (!$selected_template && !$default_template) : ?>
                     <option value="" selected>Template auswählen</option>
                 <? endif; ?>
@@ -70,6 +73,32 @@ class MetaBox
                 <?php } ?>
             </select>
         </div>
+        <style>
+            .templates {
+                padding-top: 0.5em;
+                text-align: center;
+            }
+            .inside {
+                border: 4px solid #1d2327;
+                margin: 0 !important;
+            }
+            #rahmentemplate_settings_page .postbox-header {
+                background: #1d2327;
+                color: #fff !important;
+            }
+            .selectDefault {
+                border: none;
+                box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.1) !important;
+                text-align: center;
+                transition: .3s;
+                width: 30%;
+            }
+            .selectDefault:focus {
+                box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.4) !important;
+                transition: .3s;
+                border: none !important;
+            }
+        </style>
         <?php
     }
 }

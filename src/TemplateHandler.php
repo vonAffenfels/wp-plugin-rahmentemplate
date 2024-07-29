@@ -13,11 +13,16 @@ class TemplateHandler
      */
     function initTemplateHandler($content) : void
     {
+        $templateUrl = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
         $client = new Client([
             'auth' => ['test', 'test'],
+            'headers' => [
+                'Origin' => $templateUrl,
+                'Access-Control-Allow-Origin' => $templateUrl,
+                'Access-Control-Allow-Methods' => 'GET',
+                'Access-Control-Allow-Headers' => 'Content-Type',
+            ]
         ]);
-
-        $templateUrl = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
 
         if (empty($templateUrl) || !filter_var($templateUrl, FILTER_VALIDATE_URL)) {
             echo 'Invalid template URL.';
@@ -27,7 +32,7 @@ class TemplateHandler
         try {
             $template = $client->request('GET', $templateUrl);
             $templateBody = $template->getBody()->getContents();
-
+            
             $dom = new DOMDocument();
             @$dom->loadHTML($templateBody);
 
@@ -51,11 +56,9 @@ class TemplateHandler
                 }
             }
 
-            $updatedTemplate = $dom->saveHTML();
+            $updatedTemplate = mb_convert_encoding($dom->saveHTML() , 'UTF-8', 'HTML-ENTITIES');
 
-            $contentReplacedTemplate = str_replace('CONTENT', $content, $updatedTemplate);
-
-            echo $contentReplacedTemplate;
+            echo $updatedTemplate;
         } catch (\Exception $e) {
             echo 'An error occurred: ' . $e->getMessage();
         }

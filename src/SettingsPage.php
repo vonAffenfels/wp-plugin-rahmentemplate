@@ -408,7 +408,7 @@ class SettingsPage
                 <div class="input-group">
                     <input class="inputTitle" type="text" placeholder="Titel" name="" />
                     <input class="inputURL" type="text" placeholder="URL" name="" />
-                    <input class="inputReplace" type="text" placeholder="Content to Replace" name="" />
+                    <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
                     <button class="remove-row button">Löschen</button>
                 </div>
@@ -425,7 +425,7 @@ class SettingsPage
             <div class="input-group">
                 <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[0][title]" />
                 <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[0][url]" />
-                <input class="inputReplace" type="text" placeholder="Content to Replace" name="rahmentemplate_settings_input_templates_field[0][replace]" />
+                <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[0][replace]" />
                 <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
                 <button class="remove-row button">Löschen</button>
             </div>

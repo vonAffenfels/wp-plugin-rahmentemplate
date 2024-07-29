@@ -26,10 +26,7 @@ class TemplateHandler
         $client = new Client([
             'auth' => ['test', 'test'],
             'headers' => [
-                'Origin' => $templateUrl,
-                'Access-Control-Allow-Origin' => $templateUrl,
-                'Access-Control-Allow-Methods' => 'GET',
-                'Access-Control-Allow-Headers' => 'Content-Type',
+                'Origin' => get_home_url()
             ]
         ]);
 

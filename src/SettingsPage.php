@@ -39,26 +39,6 @@ class SettingsPage
             'rahmentemplate-settings-page'
         );
 
-        // Register ID input field
-        register_setting(
-            'rahmentemplate-settings-page',
-            'rahmentemplate_settings_input_templates_field',
-            array(
-                'type' => 'array',
-                'sanitize_callback' => [$this, 'rahmentemplate_sanitize'],
-                'default' => array()
-            )
-        );
-
-        // Add ID fields
-        add_settings_field(
-            'rahmentemplate_settings_input_templates_field',
-            __( 'Templates', 'rahmentemplate' ),
-            [$this,'rahmentemplate_settings_input_templates_field_callback'],
-            'rahmentemplate-settings-page',
-            'rahmentemplate_settings_section'
-        );
-
         // Register default field
         register_setting(
             'rahmentemplate-settings-page',
@@ -75,6 +55,26 @@ class SettingsPage
             'rahmentemplate_settings_input_default_field',
             __( 'Standard Template', 'rahmentemplate' ),
             [$this,'rahmentemplate_settings_input_default_field_callback'],
+            'rahmentemplate-settings-page',
+            'rahmentemplate_settings_section'
+        );
+
+        // Register ID input field
+        register_setting(
+            'rahmentemplate-settings-page',
+            'rahmentemplate_settings_input_templates_field',
+            array(
+                'type' => 'array',
+                'sanitize_callback' => [$this, 'rahmentemplate_sanitize'],
+                'default' => array()
+            )
+        );
+
+        // Add ID fields
+        add_settings_field(
+            'rahmentemplate_settings_input_templates_field',
+            __( 'Templates', 'rahmentemplate' ),
+            [$this,'rahmentemplate_settings_input_templates_field_callback'],
             'rahmentemplate-settings-page',
             'rahmentemplate_settings_section'
         );
@@ -97,7 +97,11 @@ class SettingsPage
         $selected_template = get_option('rahmentemplate_settings_input_default_field');
         $templates = get_option('rahmentemplate_settings_input_templates_field', array());
        ?>
-         <select name="rahmentemplate_settings_input_default_field">
+        <div class="infobox">
+            <p>Die Select Box bietet eine Liste von verfügbaren Templates, die für Posts verwendet werden können. Das ausgewählte Template
+            dient als Standard, wenn Posts kein anderes der aufgelisteten Templates hinterlegt haben.</p>
+        </div>
+         <select name="rahmentemplate_settings_input_default_field" class="selectDefault">
                 <option value="">Template auswählen</option>
                 <?php foreach ($templates as $template) {
                     $selected = $selected_template == $template['url'] ?? '';
@@ -121,6 +125,18 @@ class SettingsPage
 
     public function markup($templates, $counted_templates) {
         ?>
+        <div class="infobox">
+            <p>Templates die in der oberen Select Box als Standard, oder im jeweiligen Post verwendet werden können.</p><br>
+            <li>Templates in Benutzung können nicht gelöscht werden.</li>
+            <li>Unter "Details" werden Posts aufgelistet, die das entsprechende Template in Benutzung haben.</li>
+        </div>
+        <div class="headings">
+            <span><b>Name</b></span>
+            <span><b>URL</b></span>
+            <span><b>Zu ersetzender Text</b></span>
+            <span><b>Verwendungen</b></span>
+            <span><b>Bearbeiten</b></span>
+        </div>
         <div class="repeatable-fieldset-container">
             <?php if ($templates) {
                 foreach ($templates as $key => $field) {
@@ -141,14 +157,17 @@ class SettingsPage
     public function css() {
         ?>
         <style>
+            table {
+                border: 4px solid #1d2327;
+                overflow: hidden;
+            }
             .repeatable-fieldset-container {
                 display: flex;
                 flex-direction: column;
             }
             .repeatable-fieldset {
-                padding-bottom: 1em;
-                padding-top: 1em;
-                border-top: 1px solid black;
+                padding-bottom: 1.5em;
+                padding-top: 1.5em;
             }
             .input-group {
                 display: flex;
@@ -165,7 +184,21 @@ class SettingsPage
             }
             .repeatable-fieldset-container input {
                 flex: 1;
+                width: 20%;
                 margin-right: 10px;
+                box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.1);
+                transition: .3s;
+                border: none;
+            }
+            .repeatable-fieldset-container input:focus {
+                box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.4);
+                transition: .3s;
+            }
+            .repeatable-fieldset-container button {
+                flex: 1;
+                width: 20%;
+                margin-right: 10px;
+                font-weight: bold;
             }
             button {
                 width: 100px;
@@ -173,10 +206,37 @@ class SettingsPage
             .remove-row {
                 border-color: #dc3232 !important;
                 color: #dc3232 !important;
+                transition: .3s;
+                box-shadow: 0 6px 10px 0 rgba(220, 50, 50, 0.3);
+            }
+            .remove-row:hover {
+                border-color: #dc3232 !important;
+                color: #fff !important;
+                background: #dc3232 !important;
+                transition: .3s;
             }
             .add-row {
                 border-color: #46b450 !important;
                 color: #46b450 !important;
+                width: 19.5%;
+                box-shadow: 0 6px 10px 0 rgba(70, 180, 80, 0.3) !important;
+                transition: .3s;
+                font-weight: bold;
+            }
+            .add-row:hover {
+                border-color: #46b450 !important;
+                color: #fff !important;
+                background: #46b450 !important;
+                transition: .3s;
+            }
+            .open-details {
+                box-shadow: 0 6px 10px 0 rgba(34, 113, 177, 0.3) !important;
+            }
+            .open-details:hover, .detail-page:hover {
+                border-color: #2271b1 !important;
+                color: #fff !important;
+                background: #2271b1 !important;
+                transition: .3s;
             }
             .details {
                 height: 0;
@@ -188,10 +248,15 @@ class SettingsPage
                 height: 100%;
                 opacity: 1;
                 transition: all 0.3s ease-in-out;
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: start;
             }
             .detail-group {
                 display: flex;
+            }
+            .details h4 {
+                margin-right: 10px;
             }
             .detail-page {
                 margin-right: 1em;
@@ -206,6 +271,59 @@ class SettingsPage
                 background: #f0f0f1;
                 border-color: #0a4b78;
                 color: #0a4b78;
+            }
+            th {
+                text-transform: uppercase;
+                font-weight: bold;
+                text-align: center !important;
+                width: 100% !important;
+                font-size: 1.3em !important;
+                background: #1d2327;
+                color: #fff !important;
+            }
+            tr {
+                display: flex;
+                flex-flow: column;
+            }
+            tbody:first-child td {
+                text-align:center
+            }
+            .headings {
+                display: flex;
+                align-items: center;
+                border-bottom: 1px solid black;
+
+                span {
+                    flex: 1;
+                    margin-right: 10px;
+                    width: 20%;
+                }
+            }
+            .selectDefault {
+                border: none;
+                box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.1) !important;
+                width: 100%;
+                text-align: center;
+                transition: .3s;
+            }
+            .selectDefault:focus {
+                box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.4) !important;
+                transition: .3s;
+                border: none !important;
+            }
+            .selectDefault:hover {
+                color: #2c3338 !important;
+            }
+            .infobox {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-flow: column;
+                padding-bottom: 2em;
+
+                p {
+                    width: 50%;
+                }
             }
 
         </style>
@@ -334,7 +452,7 @@ class SettingsPage
                     <?php } ?>
                 </div>
                 <div class="details">
-                    <h3>Seiten: </h3>
+                    <h4>Seiten</h4>
                     <div class="detail-group">
                         <?php $this->getDetails($counted_templates, $field); ?>
                     </div>

@@ -57,8 +57,9 @@ class TemplateHandler
             }
 
             $updatedTemplate = mb_convert_encoding($dom->saveHTML() , 'UTF-8', 'HTML-ENTITIES');
+            $contentReplacedTemplate = str_replace('<p>CONTENT</p>', $content, $updatedTemplate);
 
-            echo $updatedTemplate;
+            echo $contentReplacedTemplate;
         } catch (\Exception $e) {
             echo 'An error occurred: ' . $e->getMessage();
         }

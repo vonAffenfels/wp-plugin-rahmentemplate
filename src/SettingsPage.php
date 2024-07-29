@@ -149,7 +149,7 @@ class SettingsPage
             ?>
         </div>
         <div class="repeatable-fieldset-actions">
-            <button id="add-row" class="button add-row">Hinzufügen</button>
+            <button id="addRow" class="button addRow">Hinzufügen</button>
         </div>
         <?php
     }
@@ -194,7 +194,7 @@ class SettingsPage
                 box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.4);
                 transition: .3s;
             }
-            .repeatable-fieldset-container button {
+            .repeatable-fieldset-container .openDetails {
                 flex: 1;
                 width: 20%;
                 margin-right: 10px;
@@ -203,19 +203,19 @@ class SettingsPage
             button {
                 width: 100px;
             }
-            .remove-row {
+            .removeRow, .cacheButton {
                 border-color: #dc3232 !important;
                 color: #dc3232 !important;
                 transition: .3s;
                 box-shadow: 0 6px 10px 0 rgba(220, 50, 50, 0.3);
             }
-            .remove-row:hover {
+            .removeRow:hover, .cacheButton:hover {
                 border-color: #dc3232 !important;
                 color: #fff !important;
                 background: #dc3232 !important;
                 transition: .3s;
             }
-            .add-row {
+            .addRow {
                 border-color: #46b450 !important;
                 color: #46b450 !important;
                 width: 19.5%;
@@ -223,16 +223,16 @@ class SettingsPage
                 transition: .3s;
                 font-weight: bold;
             }
-            .add-row:hover {
+            .addRow:hover {
                 border-color: #46b450 !important;
                 color: #fff !important;
                 background: #46b450 !important;
                 transition: .3s;
             }
-            .open-details {
+            .openDetails {
                 box-shadow: 0 6px 10px 0 rgba(34, 113, 177, 0.3) !important;
             }
-            .open-details:hover, .detail-page:hover {
+            .openDetails:hover, .detailPage:hover {
                 border-color: #2271b1 !important;
                 color: #fff !important;
                 background: #2271b1 !important;
@@ -252,13 +252,13 @@ class SettingsPage
                 align-items: center;
                 justify-content: start;
             }
-            .detail-group {
+            .detailGroup {
                 display: flex;
             }
             .details h4 {
                 margin-right: 10px;
             }
-            .detail-page {
+            .detailPage {
                 margin-right: 1em;
                 padding: 0.3em 1em;
                 border: 1px solid #3582c4;
@@ -267,7 +267,7 @@ class SettingsPage
                 background: #f6f7f7;
                 color: #0a4b78;
             }
-            .detail-page:hover {
+            .detailPage:hover {
                 background: #f0f0f1;
                 border-color: #0a4b78;
                 color: #0a4b78;
@@ -325,6 +325,14 @@ class SettingsPage
                     width: 50%;
                 }
             }
+            .detailsLeft {
+                width: 20%;
+                text-align: left;
+            }
+            .detailsRight {
+                text-align: left;
+            }
+
 
         </style>
         <?php
@@ -334,7 +342,7 @@ class SettingsPage
         ?>
         <script>
             jQuery(document).ready(function($) {
-                $('#add-row').on('click', function() {
+                $('#addRow').on('click', function() {
                     var row = $('.empty-row').clone(true);
                     row.removeClass('empty-row');
                     row.css('display', 'block')
@@ -352,7 +360,7 @@ class SettingsPage
                 });
 
 
-                $(document).on('click', '.open-details', function() {
+                $(document).on('click', '.openDetails', function() {
                     var containers = $(this).parents('.repeatable-fieldset').find('.details');
                     containers.each(function(containerIndex) {
                         $(this).toggleClass('open');
@@ -360,7 +368,7 @@ class SettingsPage
                     return false;
                 });
 
-                $(document).on('click', '.remove-row', function() {
+                $(document).on('click', '.removeRow', function() {
                     $(this).parents('.repeatable-fieldset').remove();
 
                     var containers = $('.repeatable-fieldset-container').find('.repeatable-fieldset');
@@ -410,7 +418,7 @@ class SettingsPage
                     <input class="inputURL" type="text" placeholder="URL" name="" />
                     <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
-                    <button class="remove-row button">Löschen</button>
+                    <button class="removeRow button">Löschen</button>
                 </div>
                 <div class="details">
                 </div>
@@ -427,7 +435,7 @@ class SettingsPage
                 <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[0][url]" />
                 <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[0][replace]" />
                 <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
-                <button class="remove-row button">Löschen</button>
+                <button class="removeRow button">Löschen</button>
             </div>
             <div class="details">
             </div>
@@ -445,16 +453,22 @@ class SettingsPage
                     <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][replace]" value="<?php echo $field['replace'] ?? ''; ?>" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['url'], $counted_templates) && $field['url']) ? $counted_templates[$field['url']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
                     <?php if (!array_key_exists($field['url'], $counted_templates) || !$field['url'] ) { ?>
-                        <button id="remove-row" class="remove-row button">Löschen</button>
+                        <button id="removeRow" class="removeRow button">Löschen</button>
                     <?php } else {
                         ?>
-                        <button id="open-details" class="button open-details">Details</button>
+                        <button id="openDetails" class="button openDetails">Details</button>
                     <?php } ?>
                 </div>
                 <div class="details">
-                    <h4>Seiten</h4>
-                    <div class="detail-group">
-                        <?php $this->getDetails($counted_templates, $field); ?>
+                    <div class="detailsLeft">
+                        <h4>Cache</h4>
+                        <button class="button cacheButton">Cache leeren</button>
+                    </div>
+                    <div class="detailsRight">
+                        <h4>Seiten</h4>
+                        <div class="detailGroup">
+                            <?php $this->getDetails($counted_templates, $field); ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -478,7 +492,7 @@ class SettingsPage
             if ($query->have_posts()) {
                 while ($query->have_posts()) {
                     $query->the_post();
-                    echo '<a class="detail-page" target="_blank" href="' . admin_url( 'post.php?post=' . get_the_ID() ) . '&action=edit' . '">' . get_the_title() . '</a><br>';
+                    echo '<a class="detailPage" target="_blank" href="' . admin_url( 'post.php?post=' . get_the_ID() ) . '&action=edit' . '">' . get_the_title() . '</a><br>';
                 }
             }
         }

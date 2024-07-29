@@ -15,6 +15,7 @@ class TemplateHandler
     {
         $templateUrl = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
         $templates = get_option('rahmentemplate_settings_input_templates_field', []);
+        $templateDetails = [];
 
         foreach ($templates as $template) {
             if ($template['url'] === $templateUrl) {
@@ -36,10 +37,9 @@ class TemplateHandler
         } 
 
         try {
-            $cache_key = 'template_body';
-            $cache_group = 'template_body';
+            $transient_key = $templateDetails['title'] . '_transient';
 
-            $cachedTemplate = wp_cache_get($cache_key, $cache_group);
+            $cachedTemplate = get_transient($transient_key);
 
             if ($cachedTemplate) {
                 $templateBody = $cachedTemplate;
@@ -47,7 +47,7 @@ class TemplateHandler
                 $template = $client->request('GET', $templateUrl);
                 $templateBody = $template->getBody()->getContents();
 
-                wp_cache_add($cache_key, $templateBody, $cache_group, 60 * 60 * 24);
+                set_transient($transient_key, $templateBody, 60 * 60 * 24);
             }
 
             $dom = new DOMDocument();

@@ -14,6 +14,15 @@ class TemplateHandler
     function initTemplateHandler($content) : void
     {
         $templateUrl = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
+        $templates = get_option('rahmentemplate_settings_input_templates_field', []);
+
+        foreach ($templates as $template) {
+            if ($template['url'] === $templateUrl) {
+                $templateDetails = $template;
+                break;
+            }
+        }
+
         $client = new Client([
             'auth' => ['test', 'test'],
             'headers' => [
@@ -30,9 +39,20 @@ class TemplateHandler
         } 
 
         try {
-            $template = $client->request('GET', $templateUrl);
-            $templateBody = $template->getBody()->getContents();
-            
+            $cache_key = 'template_body';
+            $cache_group = 'template_body';
+
+            $cachedTemplate = wp_cache_get($cache_key, $cache_group);
+
+            if ($cachedTemplate) {
+                $templateBody = $cachedTemplate;
+            } else {
+                $template = $client->request('GET', $templateUrl);
+                $templateBody = $template->getBody()->getContents();
+
+                wp_cache_add($cache_key, $templateBody, $cache_group, 60 * 60 * 24);
+            }
+
             $dom = new DOMDocument();
             @$dom->loadHTML($templateBody);
 
@@ -40,13 +60,13 @@ class TemplateHandler
             $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
             $baseUrl .=  '/';
           
-            $tags = [
+            $UrlTags = [
                 'img' => 'src',
                 'link' => 'href',
                 'script' => 'src'
             ];
 
-            foreach ($tags as $tag => $attribute) {
+            foreach ($UrlTags as $tag => $attribute) {
                 $elements = $dom->getElementsByTagName($tag);
                 foreach ($elements as $element) {
                     $url = $element->getAttribute($attribute);
@@ -56,8 +76,17 @@ class TemplateHandler
                 }
             }
 
+            $htmlTags = ['<p>', '<div>', '<span>'];
             $updatedTemplate = mb_convert_encoding($dom->saveHTML() , 'UTF-8', 'HTML-ENTITIES');
-            $contentReplacedTemplate = str_replace('<p>CONTENT</p>', $content, $updatedTemplate);
+            
+            foreach ($htmlTags as $tag) {
+                $closeTag = str_replace('<', '</', $tag);
+                $replace = $tag . (!empty($templateDetails['replace']) ? $templateDetails['replace'] : 'CONTENT') . $closeTag;
+
+                $updatedTemplate  = str_replace($replace, $content, $updatedTemplate);
+            }
+
+            $contentReplacedTemplate = $updatedTemplate;
 
             echo $contentReplacedTemplate;
         } catch (\Exception $e) {

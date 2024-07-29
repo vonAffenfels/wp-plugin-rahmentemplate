@@ -86,6 +86,7 @@ class SettingsPage
                 $input[$key]['default'] = sanitize_text_field($value['default']);
                 $input[$key]['title'] = sanitize_text_field($value['title']);
                 $input[$key]['url'] = sanitize_text_field($value['url']);
+                $input[$key]['replace'] = sanitize_text_field($value['replace']);
             }
         }
         return $input;
@@ -101,7 +102,7 @@ class SettingsPage
                 <?php foreach ($templates as $template) {
                     $selected = $selected_template == $template['url'] ?? '';
                     ?>
-                    <option value="<?php echo esc_attr($template['url'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
+                    <option value="<?php echo $template['url']?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
                 <?php } ?>
         </select>
         <?php
@@ -152,7 +153,6 @@ class SettingsPage
             .input-group {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
             }
             .repeatable-fieldset select {
                 flex: 1;
@@ -161,6 +161,10 @@ class SettingsPage
                 margin-top: 10px;
             }
             .repeatable-fieldset-actions button {
+                margin-right: 10px;
+            }
+            .repeatable-fieldset-container input {
+                flex: 1;
                 margin-right: 10px;
             }
             button {
@@ -223,6 +227,7 @@ class SettingsPage
                     containers.each(function(containerIndex) {
                         $(this).find('.inputTitle').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][title]');
                         $(this).find('.inputURL').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][url]');
+                        $(this).find('.inputReplace').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][replace]');
                     });
 
                     return false;
@@ -244,6 +249,7 @@ class SettingsPage
                     containers.each(function(containerIndex) {
                         $(this).find('.inputTitle').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][title]');
                         $(this).find('.inputURL').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][url]');
+                        $(this).find('.inputReplace').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][replace]');
                     });
 
                     return false;
@@ -284,6 +290,7 @@ class SettingsPage
                 <div class="input-group">
                     <input class="inputTitle" type="text" placeholder="Titel" name="" />
                     <input class="inputURL" type="text" placeholder="URL" name="" />
+                    <input class="inputReplace" type="text" placeholder="Content to Replace" name="" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
                     <button class="remove-row button">Löschen</button>
                 </div>
@@ -300,6 +307,7 @@ class SettingsPage
             <div class="input-group">
                 <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[0][title]" />
                 <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[0][url]" />
+                <input class="inputReplace" type="text" placeholder="Content to Replace" name="rahmentemplate_settings_input_templates_field[0][replace]" />
                 <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
                 <button class="remove-row button">Löschen</button>
             </div>
@@ -316,6 +324,7 @@ class SettingsPage
                 <div class="input-group">
                     <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
                     <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
+                    <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][replace]" value="<?php echo $field['replace'] ?? ''; ?>" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['url'], $counted_templates) && $field['url']) ? $counted_templates[$field['url']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
                     <?php if (!array_key_exists($field['url'], $counted_templates) || !$field['url'] ) { ?>
                         <button id="remove-row" class="remove-row button">Löschen</button>

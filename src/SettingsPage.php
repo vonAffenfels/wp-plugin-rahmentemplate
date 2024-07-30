@@ -87,7 +87,6 @@ class SettingsPage
                 $input[$key]['title'] = sanitize_text_field($value['title']);
                 $input[$key]['url'] = sanitize_text_field($value['url']);
                 $input[$key]['replace'] = sanitize_text_field($value['replace']);
-                $input[$key]['killCache'] = sanitize_text_field($value['killCache']);
             }
         }
         return $input;
@@ -133,18 +132,13 @@ class SettingsPage
             <li>Unter "Details" kann der entsprechende Cache markiert und anschließend beim Speichervorgang geleert werden.</li>
         </div>
         <div class="cacheInfo">
-            <?php
-            foreach($templates as $template) {
-                if (array_key_exists('killCache', $template) && $template['killCache'] === 'true') { ?>
-                    <p>Caches wurden geleert</p>
-              <?php  }
-            } ?>
+            <p class="cacheInfoText"></p>
         </div>
         <div class="headings">
             <span><b>Name</b></span>
             <span><b>URL</b></span>
             <span><b>Zu ersetzender Text</b></span>
-            <span><b>Verwendungen</b></span>
+            <span><b>Benutzung</b></span>
             <span><b>Bearbeiten</b></span>
         </div>
         <div class="repeatable-fieldset-container">
@@ -159,13 +153,15 @@ class SettingsPage
             ?>
         </div>
         <div class="repeatable-fieldset-actions">
-            <button id="addRow" class="button addRow">Hinzufügen</button>
+            <button id="addRow" class="button addRow">Hinzufügen</button><br><br>
+            <button id="clearAllCaches" class="button red">Markierte Caches leeren</button>
         </div>
         <?php
     }
 
     private function count_templates($pages)
     {
+        $selected_templates = [];
         foreach ($pages as $key => $page) {
             $selected_templates[$key] = get_post_meta($page->ID, 'rahmentemplate_settings_input_templates_field', true);
         }
@@ -225,9 +221,9 @@ class SettingsPage
                 </div>
                 <div class="details">
                     <div class="detailsLeft">
-                        <h4><?php $this->addCacheFieldAndCacheHandling($field, $key); ?></h4>
+                        <h4><?php $this->addCacheData($field, $key); ?></h4>
                         <label>
-                            <input type="checkbox" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][killCache]" value="false" id="cacheButton" class="button cacheButton"><br><br>
+                            <input type="checkbox" value="<?php echo $field['title'] . '_transient' ?>" id="cacheButton" class="button cacheButton"><br><br>
                             <?php
                             ?>
                         </label>
@@ -266,26 +262,14 @@ class SettingsPage
         }
     }
 
-    private function killCache(mixed $field)
+    private function addCacheData(mixed $field, $key)
     {
-        $transient_key = $field['title'] . '_transient';
-        delete_transient($transient_key);
-    }
+        $cache = get_transient($field['title'] . '_transient');
 
-    private function addCacheFieldAndCacheHandling(mixed $field, $key)
-    {
-        if (array_key_exists('killCache', $field) && $field['killCache'] === 'true') {
-            $this->killCache($field);
-        }
-
-        $expires = (int) get_option( '_transient_timeout_'.$field['title'].'_transient', 0 );
-        $time_left = round($expires - time());
-
-        if ($time_left > 0) {
-            $expiration_date = date('d.m.Y H:i:s', time() + $time_left). ' Uhr';
-            echo '<p>Cache gültig bis: <br>'. $expiration_date . '</p>';
+        if (isset($cache['createdAt']) &&  $cache['createdAt'] > 0) {
+            echo '<p>Cache wurde erstellt am: <br>'. date('d.m.Y H:i', $cache['createdAt']) . '</p>';
         } else {
-            echo '<p>Cache abgelaufen</p>';
+            echo '<p>Cache nicht erstellt.</p>';
         }
     }
 
@@ -293,11 +277,12 @@ class SettingsPage
         ?>
         <div class="wrap">
             <h2>Rahmentemplate Settings</h2>
-            <form action="options.php" method="post">
+            <form action="options.php" method="post" id="options" class="options">
                 <?php
                 settings_fields('rahmentemplate-settings-page');
                 do_settings_sections('rahmentemplate-settings-page');
-                submit_button();
+                submit_button('Aktualisieren');
+                exit;
                 ?>
             </form>
         </div>
@@ -351,7 +336,7 @@ class SettingsPage
             button {
                 width: 100px;
             }
-            .removeRow {
+            .removeRow, .red {
                 border-color: #dc3232 !important;
                 color: #dc3232 !important;
                 transition: .3s;
@@ -361,7 +346,7 @@ class SettingsPage
                 font-weight: bold;
                 margin-right: 0 !important;
             }
-            .removeRow:hover, .detailsLeft input[type="checkbox"]:hover {
+            .removeRow:hover, .red:hover, .detailsLeft input[type="checkbox"]:hover {
                 border-color: #dc3232 !important;
                 color: #fff !important;
                 background: #dc3232 !important;
@@ -573,13 +558,34 @@ class SettingsPage
                     return false;
                 });
 
-                $("#cacheButton").on('change', function() {
-                    if ($(this).is(':checked')) {
-                        $(this).attr('value', 'true');
-                    } else {
-                        $(this).attr('value', 'false');
-                    }
+                $(document).on('change', '#cacheButton', function() {
+                    var containers = $(this).parents('.repeatable-fieldset').find('.detailsLeft input[type="checkbox"]');
+                    containers.each(function(containerIndex, container) {
+                        $(container).toggleClass('marked');
+                    });
                 });
+
+                $(document).on('click', '#clearAllCaches', function() {
+                    const markedCaches = document.querySelectorAll('.marked');
+                    let cacheArray = [];
+                    markedCaches.forEach(function(item) {
+                        cacheArray.push(item.value);
+                    });
+
+                    const data = {
+                        'action': 'clearCache',
+                        'transient_keys': cacheArray
+                    };
+
+                    $.post('/wp-json/rahmentemplate/v1/clearCache', data, async function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            console.log('Failed to clear cache.');
+                        }
+                    });
+                });
+
             });
         </script>
         <?php

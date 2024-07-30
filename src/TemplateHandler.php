@@ -42,16 +42,17 @@ class TemplateHandler
             $cachedTemplate = get_transient($transient_key);
 
             if ($cachedTemplate) {
-                $templateBody = $cachedTemplate;
+                $template = $cachedTemplate;
             } else {
-                $template = $client->request('GET', $templateUrl);
-                $templateBody = $template->getBody()->getContents();
+                $templateRequest = $client->request('GET', $templateUrl);
+                $template['body'] = $templateRequest->getBody()->getContents();
+                $template['createdAt'] = current_time('timestamp');
 
-                set_transient($transient_key, $templateBody, 60 * 60 * 48);
+                set_transient($transient_key, $template, 60 * 60 * 48);
             }
 
             $dom = new DOMDocument();
-            @$dom->loadHTML($templateBody);
+            @$dom->loadHTML($template['body']);
 
             $parsedUrl = parse_url($templateUrl);
             $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];

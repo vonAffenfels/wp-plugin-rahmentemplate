@@ -14,6 +14,9 @@ class Plugin
         $metaBox = new MetaBox();
         $metaBox->registerField();
 
+        $clearCache = new RestRoutes\ClearCache();
+        $clearCache->register_routes();
+
         add_filter( 'the_content', [$this, 'handleTemplateAfterContentLoaded'] );
     }
 

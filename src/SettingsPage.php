@@ -87,6 +87,7 @@ class SettingsPage
                 $input[$key]['title'] = sanitize_text_field($value['title']);
                 $input[$key]['url'] = sanitize_text_field($value['url']);
                 $input[$key]['replace'] = sanitize_text_field($value['replace']);
+                $input[$key]['killCache'] = sanitize_text_field($value['killCache']);
             }
         }
         return $input;
@@ -163,6 +164,147 @@ class SettingsPage
         <?php
     }
 
+    private function count_templates($pages)
+    {
+        foreach ($pages as $key => $page) {
+            $selected_templates[$key] = get_post_meta($page->ID, 'rahmentemplate_settings_input_templates_field', true);
+        }
+        return array_count_values($selected_templates);
+    }
+
+    private function addHiddenFieldset()
+    {
+        ?>
+            <!-- empty hidden one for jQuery -->
+            <div class="empty-row" style="display: none">
+                <div class="input-group">
+                    <input class="inputTitle" type="text" placeholder="Titel" name="" />
+                    <input class="inputURL" type="text" placeholder="URL" name="" />
+                    <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="" />
+                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
+                    <button class="button removeRow">Löschen</button>
+                </div>
+                <div class="details">
+                </div>
+            </div>
+        <?php
+    }
+
+    private function addEmptyFieldset()
+    {
+        ?>
+        <div class="empty-row repeatable-fieldset">
+            <div class="input-group">
+                <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[0][title]" />
+                <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[0][url]" />
+                <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[0][replace]" />
+                <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
+                <button class="removeRow button">Löschen</button>
+            </div>
+            <div class="details">
+            </div>
+        </div>
+        <?php
+    }
+
+    private function addFieldset(int|string $key, mixed $field, $counted_templates)
+    {
+        ?>
+            <div class="repeatable-fieldset">
+                <div class="input-group">
+                    <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
+                    <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
+                    <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][replace]" value="<?php echo $field['replace'] ?? ''; ?>" />
+                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['url'], $counted_templates) && $field['url']) ? $counted_templates[$field['url']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
+                    <?php if (!array_key_exists($field['url'], $counted_templates) || !$field['url'] ) { ?>
+                        <button id="removeRow" class="removeRow button">Löschen</button>
+                    <?php } else {
+                        ?>
+                        <button id="openDetails" class="button openDetails">Details</button>
+                    <?php } ?>
+                </div>
+                <div class="details">
+                    <div class="detailsLeft">
+                        <h4><?php $this->addCacheFieldAndCacheHandling($field, $key); ?></h4>
+                        <label>
+                            <input type="checkbox" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][killCache]" value="false" id="cacheButton" class="button cacheButton"><br><br>
+                            <?php
+                            ?>
+                        </label>
+                    </div>
+                    <div class="detailsRight">
+                        <h4>Seiten</h4>
+                        <div class="detailGroup">
+                            <?php $this->getAdminPagesUsingTemplate($counted_templates, $field); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php
+    }
+
+    private function getAdminPagesUsingTemplate($counted_templates, $field): void
+    {
+        if (array_key_exists($field['url'], $counted_templates) && $field['url']) {
+            $args = array(
+                'post_type' => 'page',
+                'meta_query' => array(
+                    array(
+                        'key' => 'rahmentemplate_settings_input_templates_field',
+                        'value' => $field['url'],
+                        'compare' => 'LIKE'
+                    )
+                )
+            );
+            $query = new WP_Query($args);
+            if ($query->have_posts()) {
+                while ($query->have_posts()) {
+                    $query->the_post();
+                    echo '<a class="detailPage" target="_blank" href="' . admin_url( 'post.php?post=' . get_the_ID() ) . '&action=edit' . '">' . get_the_title() . '</a><br>';
+                }
+            }
+        }
+    }
+
+    private function killCache(mixed $field)
+    {
+        $transient_key = $field['title'] . '_transient';
+        delete_transient($transient_key);
+    }
+
+    private function addCacheFieldAndCacheHandling(mixed $field, $key)
+    {
+        if (array_key_exists('killCache', $field) && $field['killCache'] === 'true') {
+            $this->killCache($field);
+        }
+
+        $expires = (int) get_option( '_transient_timeout_'.$field['title'].'_transient', 0 );
+        $time_left = round($expires - time());
+
+        if ($time_left > 0) {
+            $expiration_date = date('d.m.Y H:i:s', time() + $time_left). ' Uhr';
+            echo '<p>Cache gültig bis: <br>'. $expiration_date . '</p>';
+        } else {
+            echo '<p>Cache abgelaufen</p>';
+        }
+    }
+
+    public function rahmentemplate_settings_page() {
+        ?>
+        <div class="wrap">
+            <h2>Rahmentemplate Settings</h2>
+            <form action="options.php" method="post">
+                <?php
+                settings_fields('rahmentemplate-settings-page');
+                do_settings_sections('rahmentemplate-settings-page');
+                submit_button();
+                ?>
+            </form>
+        </div>
+        <?php
+    }
+
+
     public function css() {
         ?>
         <style>
@@ -203,7 +345,7 @@ class SettingsPage
             .repeatable-fieldset-container .openDetails {
                 flex: 1;
                 width: 20%;
-                margin-right: 10px;
+                margin-right: 0;
                 font-weight: bold;
             }
             button {
@@ -217,7 +359,7 @@ class SettingsPage
                 flex: 1;
                 width: 20%;
                 font-weight: bold;
-                margin-right: 10px !important;
+                margin-right: 0 !important;
             }
             .removeRow:hover, .detailsLeft input[type="checkbox"]:hover {
                 border-color: #dc3232 !important;
@@ -256,11 +398,6 @@ class SettingsPage
                 transition: .3s;
                 border: none !important;
             }
-            .detailsLeft p {
-                color: #46b450;
-                font-weight: bold;
-                text-shadow: 0 6px 10px 0 rgba(70, 180, 80, 0.3);
-            }
             .addRow {
                 border-color: #46b450 !important;
                 color: #46b450 !important;
@@ -295,7 +432,7 @@ class SettingsPage
                 opacity: 1;
                 transition: all 0.3s ease-in-out;
                 display: flex;
-                align-items: center;
+                align-items: flex-start;
                 justify-content: start;
             }
             .detailGroup {
@@ -391,6 +528,7 @@ class SettingsPage
         <?php
     }
 
+
     public function js() {
         ?>
         <script>
@@ -445,132 +583,5 @@ class SettingsPage
             });
         </script>
         <?php
-    }
-
-    public function rahmentemplate_settings_page() {
-        ?>
-        <div class="wrap">
-            <h2>Rahmentemplate Settings</h2>
-            <form action="options.php" method="post">
-                <?php
-                settings_fields('rahmentemplate-settings-page');
-                do_settings_sections('rahmentemplate-settings-page');
-                submit_button();
-                ?>
-            </form>
-        </div>
-        <?php
-    }
-
-    private function count_templates($pages)
-    {
-        foreach ($pages as $key => $page) {
-            $selected_templates[$key] = get_post_meta($page->ID, 'rahmentemplate_settings_input_templates_field', true);
-        }
-        return array_count_values($selected_templates);
-    }
-
-    private function addHiddenFieldset()
-    {
-        ?>
-            <!-- empty hidden one for jQuery -->
-            <div class="empty-row" style="display: none">
-                <div class="input-group">
-                    <input class="inputTitle" type="text" placeholder="Titel" name="" />
-                    <input class="inputURL" type="text" placeholder="URL" name="" />
-                    <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="" />
-                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
-                    <button class="button removeRow">Löschen</button>
-                </div>
-                <div class="details">
-                </div>
-            </div>
-        <?php
-    }
-
-    private function addEmptyFieldset()
-    {
-        ?>
-        <div class="empty-row repeatable-fieldset">
-            <div class="input-group">
-                <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[0][title]" />
-                <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[0][url]" />
-                <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[0][replace]" />
-                <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
-                <button class="removeRow button">Löschen</button>
-            </div>
-            <div class="details">
-            </div>
-        </div>
-        <?php
-    }
-
-    private function addFieldset(int|string $key, mixed $field, $counted_templates)
-    {
-        ?>
-            <div class="repeatable-fieldset">
-                <div class="input-group">
-                    <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
-                    <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
-                    <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][replace]" value="<?php echo $field['replace'] ?? ''; ?>" />
-                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['url'], $counted_templates) && $field['url']) ? $counted_templates[$field['url']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
-                    <?php if (!array_key_exists($field['url'], $counted_templates) || !$field['url'] ) { ?>
-                        <button id="removeRow" class="removeRow button">Löschen</button>
-                    <?php } else {
-                        ?>
-                        <button id="openDetails" class="button openDetails">Details</button>
-                    <?php } ?>
-                </div>
-                <div class="details">
-                    <div class="detailsLeft">
-                        <h4>Cache</h4>
-                        <label>
-                            <input type="checkbox" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][killCache]" value="false" id="cacheButton" class="button cacheButton">
-                            <?php
-                            if (array_key_exists('killCache', $field) && $field['killCache'] === 'true') {
-                                $this->killCache($field);
-                            }
-                            ?>
-                        </label>
-                    </div>
-                    <div class="detailsRight">
-                        <h4>Seiten</h4>
-                        <div class="detailGroup">
-                            <?php $this->getDetails($counted_templates, $field); ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php
-    }
-
-    private function getDetails($counted_templates, $field): void
-    {
-        if (array_key_exists($field['url'], $counted_templates) && $field['url']) {
-            $args = array(
-                'post_type' => 'page',
-                'meta_query' => array(
-                    array(
-                        'key' => 'rahmentemplate_settings_input_templates_field',
-                        'value' => $field['url'],
-                        'compare' => 'LIKE'
-                    )
-                )
-            );
-            $query = new WP_Query($args);
-            if ($query->have_posts()) {
-                while ($query->have_posts()) {
-                    $query->the_post();
-                    echo '<a class="detailPage" target="_blank" href="' . admin_url( 'post.php?post=' . get_the_ID() ) . '&action=edit' . '">' . get_the_title() . '</a><br>';
-                }
-            }
-        }
-    }
-
-    private function killCache(mixed $field)
-    {
-        $transient_key = $field['title'] . '_transient';
-        delete_transient($transient_key);
-        return current_datetime()->format('Y-m-d H:i:s');
     }
 }

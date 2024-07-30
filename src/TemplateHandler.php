@@ -47,7 +47,7 @@ class TemplateHandler
                 $template = $client->request('GET', $templateUrl);
                 $templateBody = $template->getBody()->getContents();
 
-                set_transient($transient_key, $templateBody, 60 * 60 * 24);
+                set_transient($transient_key, $templateBody, 60 * 60 * 48);
             }
 
             $dom = new DOMDocument();

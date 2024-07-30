@@ -129,6 +129,15 @@ class SettingsPage
             <p>Templates die in der oberen Select Box als Standard, oder im jeweiligen Post verwendet werden können.</p><br>
             <li>Templates in Benutzung können nicht gelöscht werden.</li>
             <li>Unter "Details" werden Posts aufgelistet, die das entsprechende Template in Benutzung haben.</li>
+            <li>Unter "Details" kann der entsprechende Cache markiert und anschließend beim Speichervorgang geleert werden.</li>
+        </div>
+        <div class="cacheInfo">
+            <?php
+            foreach($templates as $template) {
+                if (array_key_exists('killCache', $template) && $template['killCache'] === 'true') { ?>
+                    <p>Caches wurden geleert</p>
+              <?php  }
+            } ?>
         </div>
         <div class="headings">
             <span><b>Name</b></span>
@@ -179,9 +188,6 @@ class SettingsPage
             .repeatable-fieldset-actions {
                 margin-top: 10px;
             }
-            .repeatable-fieldset-actions button {
-                margin-right: 10px;
-            }
             .repeatable-fieldset-container input {
                 flex: 1;
                 width: 20%;
@@ -203,17 +209,57 @@ class SettingsPage
             button {
                 width: 100px;
             }
-            .removeRow, .cacheButton {
+            .removeRow {
                 border-color: #dc3232 !important;
                 color: #dc3232 !important;
                 transition: .3s;
                 box-shadow: 0 6px 10px 0 rgba(220, 50, 50, 0.3);
+                flex: 1;
+                width: 20%;
+                font-weight: bold;
+                margin-right: 10px !important;
             }
-            .removeRow:hover, .cacheButton:hover {
+            .removeRow:hover, .detailsLeft input[type="checkbox"]:hover {
                 border-color: #dc3232 !important;
                 color: #fff !important;
                 background: #dc3232 !important;
                 transition: .3s;
+            }
+            .detailsLeft input[type="checkbox"] {
+                border-color: #dc3232 !important;
+                color: #dc3232;
+                transition: .3s;
+                box-shadow: 0 6px 10px 0 rgba(220, 50, 50, 0.3);
+            }
+            .detailsLeft input[type="checkbox"] {
+                width: 60%;
+            }
+            .detailsLeft input[type="checkbox"]:checked {
+                background: #dc3232 !important;
+                transition: .3s;
+                box-shadow: 0 6px 10px 0 rgba(220, 50, 50, 0.3) !important;
+            }
+            .detailsLeft input[type="checkbox"]:checked::before {
+                display: none;
+            }
+            .detailsLeft input[type="checkbox"]::after {
+                content: 'Cache leeren';
+                color: #dc3232;
+                font-weight: bold;
+            }
+            .detailsLeft input[type="checkbox"]:hover::after, .detailsLeft input[type="checkbox"]:checked::after {
+                color: #fff !important;
+                transition: .3s;
+            }
+            .detailsLeft input[type="checkbox"]:focus {
+                box-shadow: 0 6px 10px 0 rgba(220, 50, 50, 0.4) !important;
+                transition: .3s;
+                border: none !important;
+            }
+            .detailsLeft p {
+                color: #46b450;
+                font-weight: bold;
+                text-shadow: 0 6px 10px 0 rgba(70, 180, 80, 0.3);
             }
             .addRow {
                 border-color: #46b450 !important;
@@ -232,7 +278,7 @@ class SettingsPage
             .openDetails {
                 box-shadow: 0 6px 10px 0 rgba(34, 113, 177, 0.3) !important;
             }
-            .openDetails:hover, .detailPage:hover {
+            .openDetails:hover, .detailPage:hover, .openDetails.open {
                 border-color: #2271b1 !important;
                 color: #fff !important;
                 background: #2271b1 !important;
@@ -292,6 +338,7 @@ class SettingsPage
                 display: flex;
                 align-items: center;
                 border-bottom: 1px solid black;
+                text-align: left;
 
                 span {
                     flex: 1;
@@ -332,6 +379,12 @@ class SettingsPage
             .detailsRight {
                 text-align: left;
             }
+            .cacheInfo {
+                margin-bottom: 2em;
+                color: #46b450;
+                text-shadow: 0 6px 10px rgba(70, 180, 80, 0.2);
+                font-weight: bold;
+            }
 
 
         </style>
@@ -362,9 +415,10 @@ class SettingsPage
 
                 $(document).on('click', '.openDetails', function() {
                     var containers = $(this).parents('.repeatable-fieldset').find('.details');
-                    containers.each(function(containerIndex) {
-                        $(this).toggleClass('open');
+                    containers.each(function(containerIndex, container) {
+                        $(container).toggleClass('open');
                     });
+                    $(this).toggleClass('open'); // Toggle the 'open' class on the clicked element
                     return false;
                 });
 
@@ -379,6 +433,14 @@ class SettingsPage
                     });
 
                     return false;
+                });
+
+                $("#cacheButton").on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $(this).attr('value', 'true');
+                    } else {
+                        $(this).attr('value', 'false');
+                    }
                 });
             });
         </script>
@@ -418,7 +480,7 @@ class SettingsPage
                     <input class="inputURL" type="text" placeholder="URL" name="" />
                     <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="">
-                    <button class="removeRow button">Löschen</button>
+                    <button class="button removeRow">Löschen</button>
                 </div>
                 <div class="details">
                 </div>
@@ -462,7 +524,14 @@ class SettingsPage
                 <div class="details">
                     <div class="detailsLeft">
                         <h4>Cache</h4>
-                        <button class="button cacheButton">Cache leeren</button>
+                        <label>
+                            <input type="checkbox" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][killCache]" value="false" id="cacheButton" class="button cacheButton">
+                            <?php
+                            if (array_key_exists('killCache', $field) && $field['killCache'] === 'true') {
+                                $this->killCache($field);
+                            }
+                            ?>
+                        </label>
                     </div>
                     <div class="detailsRight">
                         <h4>Seiten</h4>
@@ -496,5 +565,12 @@ class SettingsPage
                 }
             }
         }
+    }
+
+    private function killCache(mixed $field)
+    {
+        $transient_key = $field['title'] . '_transient';
+        delete_transient($transient_key);
+        return current_datetime()->format('Y-m-d H:i:s');
     }
 }

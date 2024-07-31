@@ -87,6 +87,7 @@ class SettingsPage
                 $input[$key]['title'] = sanitize_text_field($value['title']);
                 $input[$key]['url'] = sanitize_text_field($value['url']);
                 $input[$key]['replace'] = sanitize_text_field($value['replace']);
+                $input[$key]['ID'] = sanitize_text_field($value['ID']);
             }
         }
         return $input;
@@ -174,6 +175,7 @@ class SettingsPage
             <!-- empty hidden one for jQuery -->
             <div class="empty-row" style="display: none">
                 <div class="input-group">
+                    <input class="inputID" hidden type="text" placeholder="ID" name="" value="<?php echo uniqid() ?>"/>
                     <input class="inputTitle" type="text" placeholder="Titel" name="" />
                     <input class="inputURL" type="text" placeholder="URL" name="" />
                     <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="" />
@@ -191,6 +193,7 @@ class SettingsPage
         ?>
         <div class="empty-row repeatable-fieldset">
             <div class="input-group">
+                <input class="inputID" hidden type="text" name="rahmentemplate_settings_input_templates_field[0][ID]" value="" />
                 <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[0][title]" />
                 <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[0][url]" />
                 <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[0][replace]" />
@@ -205,14 +208,19 @@ class SettingsPage
 
     private function addFieldset(int|string $key, mixed $field, $counted_templates)
     {
+        $disabled = (array_key_exists($field['url'], $counted_templates) && $field['url']) ? 'disabled' : '';
+        if (empty($field['ID'])) {
+            $field['ID'] = uniqid();
+        }
         ?>
             <div class="repeatable-fieldset">
                 <div class="input-group">
+                    <input class="inputID" hidden type="text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][ID]" value="<?php echo $field['ID'] ?>" />
                     <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
                     <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
                     <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][replace]" value="<?php echo $field['replace'] ?? ''; ?>" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['url'], $counted_templates) && $field['url']) ? $counted_templates[$field['url']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
-                    <?php if (!array_key_exists($field['url'], $counted_templates) || !$field['url'] ) { ?>
+                    <?php if (!$disabled) { ?>
                         <button id="removeRow" class="removeRow button">Löschen</button>
                     <?php } else {
                         ?>
@@ -530,6 +538,7 @@ class SettingsPage
 
                     var containers = $('.repeatable-fieldset-container').find('.repeatable-fieldset');
                     containers.each(function(containerIndex) {
+                        $(this).find('.inputID').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][ID]');
                         $(this).find('.inputTitle').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][title]');
                         $(this).find('.inputURL').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][url]');
                         $(this).find('.inputReplace').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][replace]');
@@ -553,6 +562,7 @@ class SettingsPage
 
                     var containers = $('.repeatable-fieldset-container').find('.repeatable-fieldset');
                     containers.each(function(containerIndex) {
+                        $(this).find('.inputID').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][ID]');
                         $(this).find('.inputTitle').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][title]');
                         $(this).find('.inputURL').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][url]');
                         $(this).find('.inputReplace').attr('name', 'rahmentemplate_settings_input_templates_field[' + containerIndex + '][replace]');

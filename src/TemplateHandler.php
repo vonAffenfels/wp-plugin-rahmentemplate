@@ -17,6 +17,11 @@ class TemplateHandler
                         ? get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true)
                         : get_option('rahmentemplate_settings_input_default_field');
 
+        if (empty($templateUrl)) {
+            echo 'Keine Template-URL gefunden. Standard Template im Plugin oder Template im Beitrag hinterlegen.';
+            exit;
+        }
+
         $templates = get_option('rahmentemplate_settings_input_templates_field', []);
         $templateDetails = [];
 
@@ -30,11 +35,6 @@ class TemplateHandler
         $client = new Client([
             'auth' => ['test', 'test'],
         ]);
-
-        if (empty($templateUrl) || !filter_var($templateUrl, FILTER_VALIDATE_URL)) {
-            echo 'Invalid template URL.';
-            exit;
-        } 
 
         try {
             $transient_key = $templateDetails['title'] . '_transient';

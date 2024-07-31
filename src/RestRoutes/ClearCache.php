@@ -8,10 +8,6 @@ use WP_REST_Response;
 
 class ClearCache
 {
-    public function __construct() {
-       // add_action('rest_api_init', [$this, 'register_routes']);
-    }
-
     public function register_routes(): void
     {
         add_action('rest_api_init', function () {

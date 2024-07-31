@@ -61,15 +61,15 @@ class MetaBox
                 <? endif; ?>
                 <?php
                 foreach ($templates as $template) {
-                    if ($default_template === $template['url'] && !$selected_template) {
+                    if ($default_template === $template['ID'] && !$selected_template) {
                         $selected = true;
-                    } elseif ($selected_template === $template['url']) {
+                    } elseif ($selected_template === $template['ID']) {
                         $selected = true;
                     } else {
                         $selected = false;
                     }
                     ?>
-                    <option value="<?php echo esc_attr($template['url'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
+                    <option value="<?php echo esc_attr($template['ID'])?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
                 <?php } ?>
             </select>
         </div>

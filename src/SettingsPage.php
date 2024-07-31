@@ -105,9 +105,9 @@ class SettingsPage
          <select name="rahmentemplate_settings_input_default_field" class="selectDefault">
                 <option value="">Template auswählen</option>
                 <?php foreach ($templates as $template) {
-                    $selected = $selected_template == $template['url'] ?? '';
+                    $selected = $selected_template == $template['ID'] ?? '';
                     ?>
-                    <option value="<?php echo $template['url']?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
+                    <option value="<?php echo $template['ID']?>"<?php if($selected) echo 'selected="selected"'; ?>><?php echo esc_html($template['title']); ?></option>
                 <?php } ?>
         </select>
         <?php
@@ -208,7 +208,7 @@ class SettingsPage
 
     private function addFieldset(int|string $key, mixed $field, $counted_templates)
     {
-        $disabled = (array_key_exists($field['url'], $counted_templates) && $field['url']) ? 'disabled' : '';
+        $disabled = (array_key_exists($field['ID'], $counted_templates) && $field['ID']) ? 'disabled' : '';
         if (empty($field['ID'])) {
             $field['ID'] = uniqid();
         }
@@ -219,7 +219,7 @@ class SettingsPage
                     <input class="inputTitle" type="text" placeholder="Titel" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][title]" value="<?php echo $field['title'] ?? ''; ?>" />
                     <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
                     <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][replace]" value="<?php echo $field['replace'] ?? ''; ?>" />
-                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['url'], $counted_templates) && $field['url']) ? $counted_templates[$field['url']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
+                    <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['ID'], $counted_templates) && $field['ID']) ? $counted_templates[$field['ID']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
                     <?php if (!$disabled) { ?>
                         <button id="removeRow" class="removeRow button">Löschen</button>
                     <?php } else {

@@ -13,20 +13,23 @@ class TemplateHandler
      */
     function initTemplateHandler($content) : void
     {
-        $templateUrl =  filter_var(get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true), FILTER_VALIDATE_URL)
+        $templateID =   filter_var(get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true))
                         ? get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true)
                         : get_option('rahmentemplate_settings_input_default_field');
 
-        if (empty($templateUrl)) {
+        $templates = get_option('rahmentemplate_settings_input_templates_field', []);
+
+
+
+        if (empty($templateID)) {
             echo 'Keine Template-URL gefunden. Standard Template im Plugin oder Template im Beitrag hinterlegen.';
             exit;
         }
-
-        $templates = get_option('rahmentemplate_settings_input_templates_field', []);
+        
         $templateDetails = [];
 
         foreach ($templates as $template) {
-            if ($template['url'] === $templateUrl) {
+            if ($template['ID'] === $templateID) {
                 $templateDetails = $template;
                 break;
             }
@@ -44,7 +47,7 @@ class TemplateHandler
             if ($cachedTemplate) {
                 $template = $cachedTemplate;
             } else {
-                $templateRequest = $client->request('GET', $templateUrl);
+                $templateRequest = $client->request('GET', $templateDetails['url']);
                 $template['body'] = $templateRequest->getBody()->getContents();
                 $template['createdAt'] = current_time('timestamp');
 
@@ -54,7 +57,7 @@ class TemplateHandler
             $dom = new DOMDocument();
             @$dom->loadHTML($template['body']);
 
-            $parsedUrl = parse_url($templateUrl);
+            $parsedUrl = parse_url($templateDetails['url']);
             $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
             $baseUrl .=  '/';
           

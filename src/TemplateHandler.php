@@ -13,24 +13,30 @@ class TemplateHandler
      */
     function initTemplateHandler($content) : void
     {
-        $templateID =   filter_var(get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true))
-                        ? get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true)
-                        : get_option('rahmentemplate_settings_input_default_field');
+        $templateID =   get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
+        $defaultTemplateID = get_option('rahmentemplate_settings_input_default_field');
 
         $templates = get_option('rahmentemplate_settings_input_templates_field', []);
         
         $templateDetails = [];
+        $defaultTemplateDetails = [];
 
         foreach ($templates as $template) {
-            if ($template['ID'] === $templateID) {
-                $templateDetails = $template;
-                break;
+            switch ($template['ID']) {
+                case $templateID:
+                    $templateDetails = $template;
+                    break;
+                case $defaultTemplateID:
+                    $defaultTemplateDetails = $template;
+                    break;
             }
         }
 
-        if (empty($templateDetails['url'])) {
+        if (empty($templateDetails['url']) && empty($defaultTemplateDetails['url'])) {
             echo 'Keine Template-URL gefunden. Standard Template im Plugin oder Template im Beitrag hinterlegen.';
             exit;
+        } elseif (empty($templateDetails['url']) && !empty($defaultTemplateDetails['url'])) {
+            $templateDetails = $defaultTemplateDetails;
         }
 
         $client = new Client([

@@ -2,11 +2,12 @@
 
 namespace Rahmentemplate;
 
+use JetBrains\PhpStorm\NoReturn;
 use WP_Query;
 
 class SettingsPage
 {
-    public function initSettingsPage()
+    public function initSettingsPage(): void
     {
         add_action('admin_menu', [$this,'rahmentemplate_settings_menu']);
         add_action('admin_init', [$this,'rahmentemplate_settings_init'] );
@@ -29,7 +30,8 @@ class SettingsPage
     /**
      * Settings Template
      */
-    public function rahmentemplate_settings_init() {
+    public function rahmentemplate_settings_init(): void
+    {
 
         // Setup settings section
         add_settings_section(
@@ -80,7 +82,8 @@ class SettingsPage
         );
     }
 
-    public function rahmentemplate_sanitize($input) {
+    public function rahmentemplate_sanitize($input): array
+    {
         if (is_array($input)) {
             foreach ($input as $key => $value) {
                 $input[$key]['default'] = sanitize_text_field($value['default']);
@@ -124,7 +127,8 @@ class SettingsPage
         self::js();
     }
 
-    public function markup($templates, $counted_templates) {
+    public function markup($templates, $counted_templates): void
+    {
         ?>
         <div class="infobox">
             <p>Templates die in der oberen Select Box als Standard, oder im jeweiligen Post verwendet werden können.</p><br>
@@ -160,7 +164,7 @@ class SettingsPage
         <?php
     }
 
-    private function count_templates($pages)
+    private function count_templates($pages): array
     {
         $selected_templates = [];
         foreach ($pages as $key => $page) {
@@ -169,7 +173,7 @@ class SettingsPage
         return array_count_values($selected_templates);
     }
 
-    private function addHiddenFieldset()
+    private function addHiddenFieldset(): void
     {
         ?>
             <!-- empty hidden one for jQuery -->
@@ -206,7 +210,7 @@ class SettingsPage
         <?php
     }
 
-    private function addFieldset(int|string $key, mixed $field, $counted_templates)
+    private function addFieldset(int|string $key, mixed $field, $counted_templates): void
     {
         $idExist = array_key_exists($field['ID'], $counted_templates) && $field['ID'];
         if (empty($field['ID'])) {
@@ -229,7 +233,7 @@ class SettingsPage
                 </div>
                 <div class="details">
                     <div class="detailsLeft">
-                        <h4><?php $this->addCacheData($field, $key); ?></h4>
+                        <h4><?php $this->addCacheData($field); ?></h4>
                         <label>
                             <input type="checkbox" value="<?php echo $field['ID'] . '_transient' ?>" id="cacheButton" class="button cacheButton"><br><br>
                             <?php
@@ -273,7 +277,7 @@ class SettingsPage
         }
     }
 
-    private function addCacheData(mixed $field, $key)
+    private function addCacheData(mixed $field): void
     {
         $cache = get_transient($field['ID'] . '_transient');
 
@@ -284,7 +288,7 @@ class SettingsPage
         }
     }
 
-    public function rahmentemplate_settings_page() {
+    #[NoReturn] public function rahmentemplate_settings_page() {
         ?>
         <div class="wrap">
             <h2>Rahmentemplate Settings</h2>

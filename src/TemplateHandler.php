@@ -24,12 +24,7 @@ class TemplateHandler
             }
         }
 
-        $client = new Client([
-            'auth' => ['test', 'test'],
-            'headers' => [
-                'Origin' => get_home_url()
-            ]
-        ]);
+        $client = new Client();
 
         if (empty($templateUrl) || !filter_var($templateUrl, FILTER_VALIDATE_URL)) {
             echo 'Invalid template URL.';

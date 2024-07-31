@@ -27,7 +27,7 @@
     "php": ">=7.4",
     "ext-json": "*",
     "guzzlehttp/guzzle": "^6.4 | ^7.4",
-    "ext-curl": "*"
+    "ext-dom": "*"
   },
   "scripts": {
     "test": [

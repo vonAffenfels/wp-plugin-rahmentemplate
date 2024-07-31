@@ -98,6 +98,9 @@ class MetaBox
                 transition: .3s;
                 border: none !important;
             }
+            #rahmentemplate_settings_page .handle-actions button, #rahmentemplate_settings_page .handlediv .toggle-indicator::before {
+                color: #fff !important;
+            }
         </style>
         <?php
     }

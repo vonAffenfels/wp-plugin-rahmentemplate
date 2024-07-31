@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name:       Wordpress Rahmen Template
+ * Plugin Name:       Wordpress Rahmentemplate
  * Description:       Plugin to replace Content from a Template
  * Version:           0.1
  * Requires at least: 6.2

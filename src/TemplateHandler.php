@@ -11,18 +11,18 @@ class TemplateHandler
     /**
      * @throws GuzzleException
      */
-    function initTemplateHandler($content) : void
+    function initTemplateHandler($content) : string
     {
         $templateID =   get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
         $defaultTemplateID = get_option('rahmentemplate_settings_input_default_field');
 
         $templates = get_option('rahmentemplate_settings_input_templates_field', []);
-        
+
         $templateDetails = [];
         $defaultTemplateDetails = [];
 
         foreach ($templates as $template) {
-            switch ($template['ID']) {
+            switch ($template['ID'] ?? '') {
                 case $templateID:
                     $templateDetails = $template;
                     break;
@@ -44,7 +44,7 @@ class TemplateHandler
         ]);
 
         try {
-            $transient_key = $templateDetails['ID'] . '_transient';
+            $transient_key = ($templateDetails['ID'] ?? '') . '_transient';
 
             $cachedTemplate = get_transient($transient_key);
 
@@ -64,7 +64,7 @@ class TemplateHandler
             $parsedUrl = parse_url($templateDetails['url']);
             $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
             $baseUrl .=  '/';
-          
+
             $UrlTags = [
                 'img' => 'src',
                 'link' => 'href',
@@ -83,7 +83,7 @@ class TemplateHandler
 
             $htmlTags = ['<p>', '<div>', '<span>'];
             $updatedTemplate = mb_convert_encoding($dom->saveHTML() , 'UTF-8', 'HTML-ENTITIES');
-            
+
             foreach ($htmlTags as $tag) {
                 $closeTag = str_replace('<', '</', $tag);
                 $replace = $tag . (!empty($templateDetails['replace']) ? $templateDetails['replace'] : 'CONTENT') . $closeTag;
@@ -93,12 +93,12 @@ class TemplateHandler
 
             $contentReplacedTemplate = $updatedTemplate;
 
-            echo $contentReplacedTemplate;
+            return $contentReplacedTemplate;
         } catch (\Exception $e) {
             echo 'An error occurred: ' . $e->getMessage();
         }
 
-        exit;
+        return $content;
     }
 
 }

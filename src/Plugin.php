@@ -18,6 +18,7 @@ class Plugin
         $clearCache->register_routes();
 
         add_filter( 'the_content', [$this, 'handleTemplateAfterContentLoaded'] );
+        //add_action( 'wp_footer', function() { });
     }
 
     /**
@@ -25,9 +26,13 @@ class Plugin
      */
     public function handleTemplateAfterContentLoaded($content) {
 
-        if(!is_admin() && !wp_is_json_request()) {
+        if(!is_admin() && !wp_is_json_request()
+            && ( is_single() || is_page() ) && in_the_loop() && is_main_query()
+        ) {
             $templateHandler = new TemplateHandler();
-            $templateHandler->initTemplateHandler($content);
+            return $templateHandler->initTemplateHandler($content);
         }
+
+        return $content;
     }
 }

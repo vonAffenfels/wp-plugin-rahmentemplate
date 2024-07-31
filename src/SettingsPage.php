@@ -231,7 +231,7 @@ class SettingsPage
                     <div class="detailsLeft">
                         <h4><?php $this->addCacheData($field, $key); ?></h4>
                         <label>
-                            <input type="checkbox" value="<?php echo $field['title'] . '_transient' ?>" id="cacheButton" class="button cacheButton"><br><br>
+                            <input type="checkbox" value="<?php echo $field['ID'] . '_transient' ?>" id="cacheButton" class="button cacheButton"><br><br>
                             <?php
                             ?>
                         </label>
@@ -275,7 +275,7 @@ class SettingsPage
 
     private function addCacheData(mixed $field, $key)
     {
-        $cache = get_transient($field['title'] . '_transient');
+        $cache = get_transient($field['ID'] . '_transient');
 
         if (isset($cache['createdAt']) &&  $cache['createdAt'] > 0) {
             echo '<p>Cache wurde erstellt am: <br>'. date('d.m.Y H:i', $cache['createdAt']) . '</p>';

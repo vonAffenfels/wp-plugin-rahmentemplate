@@ -38,7 +38,7 @@ class TemplateHandler
         ]);
 
         try {
-            $transient_key = $templateDetails['title'] . '_transient';
+            $transient_key = $templateDetails['ID'] . '_transient';
 
             $cachedTemplate = get_transient($transient_key);
 

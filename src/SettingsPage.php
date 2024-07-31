@@ -281,7 +281,7 @@ class SettingsPage
                 <?php
                 settings_fields('rahmentemplate-settings-page');
                 do_settings_sections('rahmentemplate-settings-page');
-                submit_button('Aktualisieren');
+                submit_button('Änderungen Speichern');
                 exit;
                 ?>
             </form>

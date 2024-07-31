@@ -34,4 +34,3 @@ class ClearCache
     }
 }
 
-new ClearCache();

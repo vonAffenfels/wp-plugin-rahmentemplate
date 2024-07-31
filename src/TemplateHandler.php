@@ -13,7 +13,10 @@ class TemplateHandler
      */
     function initTemplateHandler($content) : void
     {
-        $templateUrl = get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true);
+        $templateUrl =  filter_var(get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true), FILTER_VALIDATE_URL)
+                        ? get_post_meta(get_the_ID(), 'rahmentemplate_settings_input_templates_field', true)
+                        : get_option('rahmentemplate_settings_input_default_field');
+
         $templates = get_option('rahmentemplate_settings_input_templates_field', []);
         $templateDetails = [];
 
@@ -24,7 +27,9 @@ class TemplateHandler
             }
         }
 
-        $client = new Client();
+        $client = new Client([
+            'auth' => ['test', 'test'],
+        ]);
 
         if (empty($templateUrl) || !filter_var($templateUrl, FILTER_VALIDATE_URL)) {
             echo 'Invalid template URL.';

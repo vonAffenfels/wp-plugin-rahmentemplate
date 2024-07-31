@@ -18,13 +18,6 @@ class TemplateHandler
                         : get_option('rahmentemplate_settings_input_default_field');
 
         $templates = get_option('rahmentemplate_settings_input_templates_field', []);
-
-
-
-        if (empty($templateID)) {
-            echo 'Keine Template-URL gefunden. Standard Template im Plugin oder Template im Beitrag hinterlegen.';
-            exit;
-        }
         
         $templateDetails = [];
 
@@ -33,6 +26,11 @@ class TemplateHandler
                 $templateDetails = $template;
                 break;
             }
+        }
+
+        if (empty($templateDetails['url'])) {
+            echo 'Keine Template-URL gefunden. Standard Template im Plugin oder Template im Beitrag hinterlegen.';
+            exit;
         }
 
         $client = new Client([

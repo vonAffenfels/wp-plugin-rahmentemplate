@@ -208,7 +208,7 @@ class SettingsPage
 
     private function addFieldset(int|string $key, mixed $field, $counted_templates)
     {
-        $disabled = (array_key_exists($field['ID'], $counted_templates) && $field['ID']) ? 'disabled' : '';
+        $idExist = array_key_exists($field['ID'], $counted_templates) && $field['ID'];
         if (empty($field['ID'])) {
             $field['ID'] = uniqid();
         }
@@ -220,7 +220,7 @@ class SettingsPage
                     <input class="inputURL" type="text" placeholder="URL" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][url]" value="<?php echo $field['url'] ?? ''; ?>" />
                     <input class="inputReplace" type="text" placeholder="Zu ersetzender Text" name="rahmentemplate_settings_input_templates_field[<?php echo $key ?>][replace]" value="<?php echo $field['replace'] ?? ''; ?>" />
                     <input class="countedTemplates" type="text" disabled placeholder="nicht in Benutzung" value="<?php echo (array_key_exists($field['ID'], $counted_templates) && $field['ID']) ? $counted_templates[$field['ID']] . ' mal in Benutzung' : 'nicht in Benutzung'  ?>" />
-                    <?php if (!$disabled) { ?>
+                    <?php if (!$idExist) { ?>
                         <button id="removeRow" class="removeRow button">Löschen</button>
                     <?php } else {
                         ?>
@@ -239,7 +239,10 @@ class SettingsPage
                     <div class="detailsRight">
                         <h4>Seiten</h4>
                         <div class="detailGroup">
-                            <?php $this->getAdminPagesUsingTemplate($counted_templates, $field); ?>
+                            <?php
+                            if ($idExist) {
+                                $this->getAdminPagesUsingTemplate($counted_templates, $field);
+                            } ?>
                         </div>
                     </div>
                 </div>
@@ -249,13 +252,13 @@ class SettingsPage
 
     private function getAdminPagesUsingTemplate($counted_templates, $field): void
     {
-        if (array_key_exists($field['url'], $counted_templates) && $field['url']) {
+        if (array_key_exists($field['ID'], $counted_templates) && $field['ID']) {
             $args = array(
                 'post_type' => 'page',
                 'meta_query' => array(
                     array(
                         'key' => 'rahmentemplate_settings_input_templates_field',
-                        'value' => $field['url'],
+                        'value' => $field['ID'],
                         'compare' => 'LIKE'
                     )
                 )

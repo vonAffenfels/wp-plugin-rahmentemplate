@@ -346,6 +346,9 @@ class SettingsPage
                 font-weight: bold;
                 margin-right: 0 !important;
             }
+            .red {
+                width: 19.5%;
+            }
             .removeRow:hover, .red:hover, .detailsLeft input[type="checkbox"]:hover {
                 border-color: #dc3232 !important;
                 color: #fff !important;

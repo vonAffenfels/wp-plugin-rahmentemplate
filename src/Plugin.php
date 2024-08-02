@@ -31,7 +31,7 @@ class Plugin
             $templateHandler = new TemplateHandler();
             return $templateHandler->initTemplateHandler($content);
         }
-
+        
         return $content;
     }
 }

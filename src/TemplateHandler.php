@@ -42,9 +42,7 @@ class TemplateHandler
             $template = $this->checkForCache($client, $templateDetails);
             $template = new TemplateParts($template, $templateDetails, $content);
 
-            $templateHead = $this->getTemplateBeforeContent($template);
             $content = $this->getTemplateContent($template);
-            $templateFooter = $this->getTemplateAfterContent($template);
 
             return $this->putTogetherTemplate($template);
         } catch (\Exception $e) {
@@ -102,7 +100,7 @@ class TemplateHandler
         return get_option('rahmentemplate_settings_input_templates_field', []);
     }
 
-    private function putTogetherTemplate($template)
+    private function putTogetherTemplate($template): string
     {
         return $template->beforeContent() . $template->content() . $template->afterContent();
     }
@@ -111,15 +109,4 @@ class TemplateHandler
     {
         return $template->content();
     }
-
-    function getTemplateBeforeContent($template)
-    {
-        return $template->beforeContent();
-    }
-
-    function getTemplateAfterContent($template)
-    {
-        return $template->afterContent();
-    }
-
 }

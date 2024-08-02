@@ -18,7 +18,6 @@ class Plugin
         $clearCache->register_routes();
 
         add_filter( 'the_content', [$this, 'handleTemplateAfterContentLoaded'] );
-        //add_action( 'wp_footer', function() { });
     }
 
     /**

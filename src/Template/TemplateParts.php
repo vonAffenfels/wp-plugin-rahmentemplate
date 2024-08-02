@@ -27,7 +27,7 @@ class TemplateParts
     
     public function beforeContent(): string
     {
-        return substr($this->template['body'], 0, strpos($this->template['body'], '<p>CONTENT</p>'));
+        return substr($this->template['body'], 0, strpos($this->template['body'], $this->templateDetails['replace'] ?: '<p>CONTENT</p>'));
     }
     
     public function content(): string
@@ -37,12 +37,13 @@ class TemplateParts
     
     public function afterContent(): string
     {
-        $countCharsUntilContent = strpos($this->template['body'], '<p>CONTENT</p>') + strlen('<p>CONTENT</p>');
+        $countCharsUntilContent = strpos($this->template['body'], $this->templateDetails['replace'] ?: '<p>CONTENT</p>') + strlen($this->templateDetails['replace'] ?: '<p>CONTENT</p>');
         return substr($this->template['body'], $countCharsUntilContent);
     }
 
-    private function replaceContent(): array|bool|string|null
+    private function replaceContent(): string
     {
+        $replaced = '';
         foreach ($this->htmlTags as $tag) {
             $closeTag = str_replace('<', '</', $tag);
             $replace = $tag . (!empty($this->templateDetails['replace']) ? $this->templateDetails['replace'] : 'CONTENT') . $closeTag;

@@ -66,7 +66,7 @@ class TemplateParts
         $UrlTags = [
             'img' => 'src',
             'link' => 'href',
-            'script' => 'src'
+            'script' => 'src',
         ];
 
         foreach ($UrlTags as $tag => $attribute) {

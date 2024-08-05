@@ -119,8 +119,9 @@ class SettingsPage
     public function rahmentemplate_settings_input_templates_field_callback(): void
     {
         $pages = get_pages();
+        $posts = get_posts();
         $templates = get_option('rahmentemplate_settings_input_templates_field', array());
-        $counted_templates = $this->count_templates($pages);
+        $counted_templates = $this->count_templates(array_merge($pages, $posts));
 
         self::markup($templates, $counted_templates);
         self::css();
@@ -258,7 +259,7 @@ class SettingsPage
     {
         if (array_key_exists($field['ID'], $counted_templates) && $field['ID']) {
             $args = array(
-                'post_type' => 'page',
+                'post_type' => ['page', 'post'],
                 'meta_query' => array(
                     array(
                         'key' => 'rahmentemplate_settings_input_templates_field',

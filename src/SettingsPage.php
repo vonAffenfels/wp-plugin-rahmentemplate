@@ -106,7 +106,7 @@ class SettingsPage
             dient als Standard, wenn Posts kein anderes der aufgelisteten Templates hinterlegt haben.</p>
         </div>
          <select name="rahmentemplate_settings_input_default_field" class="selectDefault">
-                <option value="">Template auswählen</option>
+                <option value="none">Kein Template</option>
                 <?php foreach ($templates as $template) {
                     $selected = $selected_template == $template['ID'] ?? '';
                     ?>
@@ -158,7 +158,7 @@ class SettingsPage
             ?>
         </div>
         <div class="repeatable-fieldset-actions">
-            <button id="addRow" class="button addRow">Hinzufügen</button><br><br>
+            <button id="addRow" class="button addRow">Weiteres Template hinzufügen</button><br><br>
             <button id="clearAllCaches" class="button red">Markierte Caches leeren</button>
         </div>
         <?php

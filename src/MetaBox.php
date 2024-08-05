@@ -12,7 +12,7 @@ class MetaBox
     }
     public static function add(): void
     {
-        add_meta_box('rahmentemplate_settings_page', 'Rahmentemplate', [self::class, 'html'], 'page', 'normal', 'high');
+        add_meta_box('rahmentemplate_settings_page', 'Rahmentemplate', [self::class, 'html'], '', 'normal', 'high');
     }
 
     public static function save(int $postID): void

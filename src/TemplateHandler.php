@@ -99,7 +99,7 @@ class TemplateHandler
     {
         if ($temp['ID'] === $template['ID']) {
             return $temp;
-        } elseif ($temp['ID'] === $defaultTemplateID) {
+        } elseif ($temp['ID'] === $defaultTemplateID && empty($template['ID'])) {
             return $temp;
         }
         return $template;

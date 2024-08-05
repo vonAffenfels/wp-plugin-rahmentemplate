@@ -23,7 +23,9 @@ class TemplateHandler
             $template = $this->filterTemplates($temp, $template, $defaultTemplateID);
         }
 
-        $client = new Client();
+        $client = new Client([
+            'auth' => ['test', 'test']
+        ]);
 
         $template = $this->handleTemplateExceptions($template, $defaultTemplate);
 
@@ -121,7 +123,9 @@ class TemplateHandler
      */
     function getTemplateBody ($template)
     {
-        $client = new Client();
+        $client = new Client([
+            'auth' => ['test', 'test']
+        ]);
 
         $template = $this->checkForCache($client, $template);
         return $template['body'];

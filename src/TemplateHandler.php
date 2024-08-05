@@ -2,7 +2,6 @@
 
 namespace Rahmentemplate;
 
-use DOMDocument;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Rahmentemplate\Template\TemplateParts;
@@ -12,39 +11,33 @@ class TemplateHandler
     /**
      * @throws GuzzleException
      */
-    function initTemplateHandler($content) : string
+    function initTemplateHandler($content, $templatePart = 'content') : string
     {
-        $templateID =  $this->getTemplateIDCurrentPage();
+        $template['ID'] =  $this->getTemplateIDCurrentPage();
+
         $defaultTemplateID = $this->getDefaultTemplateID();
+        $defaultTemplate = [];
+
         $templates = $this->getAllTemplates();
-        $templateDetails = [];
-        $defaultTemplateDetails = [];
-
-        $client = new Client([
-            'auth' => ['test', 'test'],
-        ]);
-
-        foreach ($templates as $template) {
-            switch ($template['ID']) {
-                case $templateID:
-                    $templateDetails = $template;
-                    break;
-                case $defaultTemplateID:
-                    $defaultTemplateDetails = $template;
-                    break;
-            }
+        foreach ($templates as $temp) {
+            $template = $this->filterTemplates($temp, $template, $defaultTemplateID);
         }
 
-        $templateDetails = $this->handleTemplateExceptions($templateDetails, $defaultTemplateDetails);
+        $client = new Client();
 
+        $template = $this->handleTemplateExceptions($template, $defaultTemplate);
 
         try {
-            $template = $this->checkForCache($client, $templateDetails);
-            $template = new TemplateParts($template, $templateDetails, $content);
+            $template = $this->checkForCache($client, $template);
+            $templateParts = new TemplateParts($template);
 
-            $content = $this->getTemplateContent($template);
-
-            return $this->putTogetherTemplate($template);
+            if ($templatePart === 'header' && $templateParts->hasBeforeContent()) {
+                return $templateParts->beforeContent();
+            } elseif ($templatePart === 'footer' && $templateParts->hasAfterContent()) {
+                return $templateParts->afterContent();
+            } else {
+                return $templateParts->content($content);
+            }
         } catch (\Exception $e) {
             echo 'An error occurred: ' . $e->getMessage();
         }
@@ -52,9 +45,21 @@ class TemplateHandler
         return $content;
     }
 
-    private function setCache($client, $templateDetails, $transient_key)
+    private function checkForCache($client, $template)
     {
-        $templateRequest = $client->request('GET', $templateDetails['url']);
+        $transient_key = ($template['ID'] ?? '') . '_transient';
+        $cachedTemplate = get_transient($transient_key);
+
+        if (!$cachedTemplate) {
+            return $this->setCache($client, $template, $transient_key);
+        } else {
+            return $cachedTemplate;
+        }
+    }
+
+    private function setCache($client, $template, $transient_key)
+    {
+        $templateRequest = $client->request('GET', $template['url']);
         $template['body'] = $templateRequest->getBody()->getContents();
         $template['createdAt'] = current_time('timestamp');
 
@@ -62,27 +67,15 @@ class TemplateHandler
         return $template;
     }
 
-    private function handleTemplateExceptions(mixed $templateDetails, mixed $defaultTemplateDetails)
+    private function handleTemplateExceptions(mixed $template, mixed $defaultTemplate)
     {
-        if (empty($templateDetails['url']) && empty($defaultTemplateDetails['url'])) {
+        if (empty($template['url']) && empty($defaultTemplate['url'])) {
             echo 'Keine Template-URL gefunden. Standard Template im Plugin oder Template im Beitrag hinterlegen.';
             exit;
-        } elseif (empty($templateDetails['url']) && !empty($defaultTemplateDetails['url'])) {
-            return $defaultTemplateDetails;
+        } elseif (empty($template['url']) && !empty($defaultTemplate['url'])) {
+            return $defaultTemplate;
         }
-        return $templateDetails;
-    }
-
-    private function checkForCache($client, $templateDetails)
-    {
-        $transient_key = ($templateDetails['ID'] ?? '') . '_transient';
-        $cachedTemplate = get_transient($transient_key);
-
-        if (!$cachedTemplate) {
-            return $this->setCache($client, $templateDetails, $transient_key);
-        } else {
-            return $cachedTemplate;
-        }
+        return $template;
     }
 
     function getTemplateIDCurrentPage()
@@ -100,13 +93,37 @@ class TemplateHandler
         return get_option('rahmentemplate_settings_input_templates_field', []);
     }
 
-    private function putTogetherTemplate($template): string
+    function filterTemplates($temp, $template, $defaultTemplateID)
     {
-        return $template->beforeContent() . $template->content() . $template->afterContent();
+        if ($temp['ID'] === $template['ID']) {
+            return $temp;
+        } elseif ($temp['ID'] === $defaultTemplateID) {
+            return $temp;
+        }
+        return $template;
     }
 
-    function getTemplateContent($template)
+    function getTemplateByID(mixed $ID)
     {
-        return $template->content();
+        $options = get_option('rahmentemplate_settings_input_templates_field', []);
+
+        foreach ($options as $option) {
+            if (isset($option['ID']) && $option['ID'] == $ID) {
+                return $option;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    function getTemplateBody ($template)
+    {
+        $client = new Client();
+
+        $template = $this->checkForCache($client, $template);
+        return $template['body'];
     }
 }

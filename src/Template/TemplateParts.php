@@ -7,18 +7,14 @@ use DOMDocument;
 class TemplateParts
 {
     private array $template = [];
-    private string $content = '';
-    private array $templateDetails = [];
     private ?DOMDocument $dom = null;
 
     private array $htmlTags = ['<p>', '<div>', '<span>'];
     
-    public function __construct($template, $templateDetails, $content)
+    public function __construct($template)
     {
         $this->dom = new DOMDocument();
         $this->template = $template;
-        $this->templateDetails = $templateDetails;
-        $this->content = $content;
 
         @$this->dom->loadHTML($this->template['body']);
         $this->replaceURLs();
@@ -27,28 +23,35 @@ class TemplateParts
     
     public function beforeContent(): string
     {
-        return substr($this->template['body'], 0, strpos($this->template['body'], $this->templateDetails['replace'] ?: '<p>CONTENT</p>'));
+        return substr($this->template['body'], 0, strpos($this->template['body'], $this->template['replace'] ?: '<p>CONTENT</p>'));
+    }
+    public function hasBeforeContent(): bool {
+        return !empty($this->beforeContent());
     }
     
-    public function content(): string
+    public function content($content): string
     {
-        return $this->replaceContent();
+        return $this->replaceContent($content);
     }
     
     public function afterContent(): string
     {
-        $countCharsUntilContent = strpos($this->template['body'], $this->templateDetails['replace'] ?: '<p>CONTENT</p>') + strlen($this->templateDetails['replace'] ?: '<p>CONTENT</p>');
+        $countCharsUntilContent = strpos($this->template['body'], $this->template['replace'] ?: '<p>CONTENT</p>') + strlen($this->template['replace'] ?: '<p>CONTENT</p>');
         return substr($this->template['body'], $countCharsUntilContent);
     }
 
-    private function replaceContent(): string
+    public function hasAfterContent(): bool {
+        return !empty($this->afterContent());
+    }
+
+    private function replaceContent($content): string
     {
         $replaced = '';
         foreach ($this->htmlTags as $tag) {
             $closeTag = str_replace('<', '</', $tag);
-            $replace = $tag . (!empty($this->templateDetails['replace']) ? $this->templateDetails['replace'] : 'CONTENT') . $closeTag;
+            $replace = $tag . (!empty($this->template['replace']) ? $this->template['replace'] : 'CONTENT') . $closeTag;
 
-            $replaced  = substr_replace($replace, $this->content, 0);
+            $replaced  = substr_replace($replace, $content, 0);
         }
 
         return $replaced;
@@ -56,7 +59,7 @@ class TemplateParts
 
     public function replaceURLs(): void
     {
-        $parsedUrl = parse_url($this->templateDetails['url']);
+        $parsedUrl = parse_url($this->template['url']);
         $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
         $baseUrl .=  '/';
 

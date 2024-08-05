@@ -93,7 +93,7 @@ class SettingsPage
                 $input[$key]['ID'] = sanitize_text_field($value['ID']);
             }
         }
-        return $input;
+        return $input ?? [];
     }
 
     public function rahmentemplate_settings_input_default_field_callback(): void

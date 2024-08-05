@@ -56,7 +56,7 @@ class MetaBox
                 <p>Die Select Box bietet eine Liste von verfügbaren Templates, die für diesen Post verwendet werden können.</p>
             </div>
             <select name="rahmentemplate_settings_input_templates_field" class="selectDefault">
-                <? if (!$selected_template && !$default_template) : ?>
+                <? if (!$selected_template && !$default_template || !isset($selected_template) && !isset($default_template)) : ?>
                     <option value="none" selected>Kein Template</option>
                 <? endif; ?>
                 <?php

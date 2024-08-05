@@ -4,14 +4,21 @@
 The WP Rahmentemplate Plugin allows users to add, manage, and apply templates within the WordPress backend. 
 This plugin provides a simple and efficient way to handle content templates, ensuring consistency and ease of use across your site.
 
-Features
-Add Templates in WP Backend: Easily add new templates with URL, name, and text replacement fields.
-Fetch Templates with Guzzle: Retrieve templates from external URLs using the Guzzle HTTP client.
-Template Caching: Templates are cached to improve performance and reduce the number of external requests.
-Clear Cache: Clear the cache to fetch the latest version of templates.
-Use Templates in Posts: Apply templates to posts, ensuring a consistent structure and style.
-Protected Templates: Templates that are in use cannot be deleted, preventing accidental loss of important content.
-Default Template: Set a default template for new posts to streamline content creation.
+### Features
+- Add Templates in WP Backend: 
+Easily add new templates with URL, name, and text replacement fields.
+- Fetch Templates with Guzzle: 
+Retrieve templates from external URLs using the Guzzle HTTP client.
+- Template Caching: 
+Templates are cached to improve performance and reduce the number of external requests.
+- Clear Cache: 
+Clear the cache to fetch the latest version of templates.
+- Use Templates in Posts: 
+Apply templates to posts, ensuring a consistent structure and style.
+- Protected Templates: 
+Templates that are in use cannot be deleted, preventing accidental loss of important content.
+- Default Template: 
+Set a default template for new posts to streamline content creation.
 
 ## Installation
 

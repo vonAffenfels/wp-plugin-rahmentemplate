@@ -15,6 +15,10 @@ class TemplateHandler
     {
         $template['ID'] =  $this->getTemplateIDCurrentPage();
 
+        if ($template['ID'] === 'none') {
+            return $content;
+        }
+
         $defaultTemplateID = $this->getDefaultTemplateID();
         $defaultTemplate = [];
 

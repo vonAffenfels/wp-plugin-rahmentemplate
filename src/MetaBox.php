@@ -57,7 +57,7 @@ class MetaBox
             </div>
             <select name="rahmentemplate_settings_input_templates_field" class="selectDefault">
                 <? if (!$selected_template && !$default_template) : ?>
-                    <option value="" selected>Template auswählen</option>
+                    <option value="none" selected>Kein Template</option>
                 <? endif; ?>
                 <?php
                 foreach ($templates as $template) {

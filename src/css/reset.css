@@ -13,9 +13,11 @@
 #navbar p, #navbar ul, #navbar ol, #navbar li,
 #footer h1, #footer h2, #footer h3, #footer h4, #footer h5, #footer h6,
 #footer p, #footer ul, #footer ol, #footer li {
+    color: inherit;
     margin: 0;
     padding: 0;
     list-style: none;
+    font-size: 100%;
 }
 
 /* Optional: Reset link styles inside #navbar and #footer */

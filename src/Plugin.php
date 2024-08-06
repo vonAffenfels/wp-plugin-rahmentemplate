@@ -57,6 +57,7 @@ class Plugin
     public function handleTemplateInFooter($content) {
         if(!is_admin() && !wp_is_json_request()) {
             $templateHandler = new TemplateHandler();
+            wp_enqueue_script('rahmen-template', plugin_dir_url(__FILE__) . 'js/classManager.js', array('jquery'), '1.0', true);
             echo $templateHandler->initTemplateHandler($content, 'footer');
         }
 

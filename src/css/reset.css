@@ -1,0 +1,33 @@
+/* CSS Reset for Header and Footer */
+header, footer {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+/* Optional: Reset styles for common elements inside header and footer */
+header h1, header h2, header h3, header h4, header h5, header h6,
+header p, header ul, header ol, header li,
+footer h1, footer h2, footer h3, footer h4, footer h5, footer h6,
+footer p, footer ul, footer ol, footer li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Optional: Reset link styles inside header and footer */
+header a, footer a {
+    color: inherit;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+/* Optional: Reset image styles inside header and footer */
+header img, footer img {
+    max-width: 100%;
+    height: auto;
+    border: 0;
+}

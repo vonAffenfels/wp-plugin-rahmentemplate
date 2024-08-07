@@ -29,7 +29,7 @@ class Plugin
     public function handleTemplateInHeader($content) {
         if(!is_admin() && !wp_is_json_request()) {
             $templateHandler = new TemplateHandler();
-            wp_enqueue_style('rahmen-template', plugin_dir_url(__FILE__) . 'css/reset.css');
+            wp_enqueue_style('rahmen-template', plugin_dir_url(__FILE__) . 'css/styles.css');
             echo $templateHandler->initTemplateHandler($content, 'header');
         }
 

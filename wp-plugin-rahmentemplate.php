@@ -3,7 +3,7 @@
 /**
  * Plugin Name:       Wordpress Rahmentemplate
  * Description:       add, manage, and apply templates to your wordpress pages
- * Version:           1.0.9
+ * Version:           1.0.13
  * Requires at least: 6.2
  * Author:            Charalambos Schmechel <charalambos.schmechel@vonaffenfels.de>
  * Author URI:        https://www.vonaffenfels.de

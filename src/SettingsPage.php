@@ -526,8 +526,11 @@ class SettingsPage
                 text-shadow: 0 6px 10px rgba(70, 180, 80, 0.2);
                 font-weight: bold;
             }
-
-
+            h4 {
+                font-size: 1em !important;
+                margin: 1.33em 0 !important;
+                font-weight: 600 !important;
+            }
         </style>
         <?php
     }

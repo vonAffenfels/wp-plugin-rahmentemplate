@@ -17,7 +17,9 @@ class TemplateParts
         $this->template = $template;
 
         @$this->dom->loadHTML($this->template['body']);
-        $this->replaceURLs();
+        if (str_contains(getenv('HTTP_HOST'), 'localhost')) {
+            $this->replaceURLs();
+        }
         $this->template['body'] = mb_convert_encoding($this->dom->saveHTML() , 'UTF-8', 'HTML-ENTITIES');
     }
     
